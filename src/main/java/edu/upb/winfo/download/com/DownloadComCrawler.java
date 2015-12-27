@@ -34,7 +34,7 @@ public class DownloadComCrawler extends WebCrawler {
      public boolean shouldVisit(Page referringPage, WebURL url) {
          String href = url.getURL().toLowerCase();
          return !FILTERS.matcher(href).matches()
-                && href.startsWith("http://www.ics.uci.edu/");
+                && href.startsWith("http://download.cnet.com/");
      }
      
      /**
@@ -56,6 +56,14 @@ public class DownloadComCrawler extends WebCrawler {
              System.out.println("Html length: " + html.length());
              System.out.println("Number of outgoing links: " + links.size());
          }
+    }
+    
+    public void visitMainPage(Page page) {
+    	
+    }
+    
+    public void visitCommentsPage(Page page) {
+    	
     }
 
 }

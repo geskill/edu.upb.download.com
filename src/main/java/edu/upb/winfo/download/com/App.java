@@ -11,9 +11,12 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
  *
  */
 public class App 
-{
-    public static void main(String[] args) throws Exception {
-        String crawlStorageFolder = "data/crawl/root/";
+{	
+	public static void main(String[] args) throws Exception {
+    	
+		Database database = new Database(""); // TODO: specify configuration file
+    	
+    	String crawlStorageFolder = "data/crawl/root/";
         int numberOfCrawlers = 7;
 
         CrawlConfig config = new CrawlConfig();
