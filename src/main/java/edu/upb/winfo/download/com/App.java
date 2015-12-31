@@ -8,41 +8,37 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 
 /**
  * Hello world!
- *
  */
-public class App 
-{	
+public class App {
 	public static void main(String[] args) throws Exception {
-    	
-		Database database = new Database(""); // TODO: specify configuration file
-    	
-    	String crawlStorageFolder = "data/crawl/root/";
-        int numberOfCrawlers = 7;
 
-        CrawlConfig config = new CrawlConfig();
-        config.setCrawlStorageFolder(crawlStorageFolder);
+		Database database = new Database(""); // TODO: specify configuration file
+
+		String crawlStorageFolder = "data/crawl/root/";
+		int numberOfCrawlers = 7;
+
+		CrawlConfig config = new CrawlConfig();
+		config.setCrawlStorageFolder(crawlStorageFolder);
 
         /*
          * Instantiate the controller for this crawl.
          */
-        PageFetcher pageFetcher = new PageFetcher(config);
-        RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
-        RobotstxtServer robotstxtServer = new RobotstxtServer(robotstxtConfig, pageFetcher);
-        CrawlController controller = new CrawlController(config, pageFetcher, robotstxtServer);
+		PageFetcher pageFetcher = new PageFetcher(config);
+		RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
+		RobotstxtServer robotstxtServer = new RobotstxtServer(robotstxtConfig, pageFetcher);
+		CrawlController controller = new CrawlController(config, pageFetcher, robotstxtServer);
 
         /*
          * For each crawl, you need to add some seed urls. These are the first
          * URLs that are fetched and then the crawler starts following links
          * which are found in these pages
          */
-        controller.addSeed("http://www.ics.uci.edu/~lopes/");
-        controller.addSeed("http://www.ics.uci.edu/~welling/");
-        controller.addSeed("http://www.ics.uci.edu/");
+		controller.addSeed("http://download.cnet.com/");
 
         /*
          * Start the crawl. This is a blocking operation, meaning that your code
          * will reach the line after this only when crawling is finished.
          */
-        controller.start(DownloadComCrawler.class, numberOfCrawlers);
-    }
+		controller.start(DownloadComCrawler.class, numberOfCrawlers);
+	}
 }
