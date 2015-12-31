@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 30. Dez 2015 um 17:37
+-- Erstellungszeit: 31. Dez 2015 um 16:38
 -- Server-Version: 5.6.24
 -- PHP-Version: 5.6.8
 
@@ -38,13 +38,12 @@ CREATE TABLE IF NOT EXISTS `download_com_products` (
   `editors_review_date` date NOT NULL,
   `editors_review_description` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `editors_review_text` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `editors_review_rating` int(1) NOT NULL,
-  `users_review_rating` int(1) NOT NULL,
+  `editors_review_rating` double NOT NULL,
+  `users_review_rating` double NOT NULL,
   `users_review_rating_count` int(6) NOT NULL,
   `publisher_description` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `publisher_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `publisher_url` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `publish_date` date NOT NULL COMMENT 'initial publish date',
   `platform` varchar(35) COLLATE utf8mb4_unicode_ci NOT NULL,
   `category` varchar(35) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subcategory` varchar(35) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -64,7 +63,9 @@ CREATE TABLE IF NOT EXISTS `download_com_product_user_reviews` (
   `mid` int(9) NOT NULL COMMENT 'message id',
   `id_p` int(9) NOT NULL COMMENT 'related product id',
   `id_v` int(9) NOT NULL COMMENT 'related version id of product',
-  `name` varchar(35) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `rating` double NOT NULL,
+  `title` varchar(35) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `author` varchar(35) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `date` date NOT NULL,
   `pros` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `cons` text COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -87,7 +88,8 @@ CREATE TABLE IF NOT EXISTS `download_com_product_versions` (
   `vid` int(9) NOT NULL COMMENT 'version id of the product',
   `version_name` varchar(35) COLLATE utf8mb4_unicode_ci NOT NULL,
   `version_alterations` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `version_date` date NOT NULL,
+  `version_publish_date` date NOT NULL,
+  `version_added_date` date NOT NULL,
   `version_identifier` varchar(35) COLLATE utf8mb4_unicode_ci NOT NULL,
   `operating_systems` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `additional_requirements` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
