@@ -7,7 +7,9 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 
 /**
- * Hello world!
+ * Created by geskill on 30.12.2015.
+ *
+ * @author geskill
  */
 public class App {
 	public static void main(String[] args) throws Exception {

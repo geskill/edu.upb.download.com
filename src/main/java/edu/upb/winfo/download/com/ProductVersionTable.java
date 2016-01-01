@@ -6,6 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * Created by geskill on 30.12.2015.
+ *
+ * @author geskill
+ */
 public class ProductVersionTable {
 
     private String dbName;
@@ -19,6 +24,24 @@ public class ProductVersionTable {
         this.dbms = dbmsArg;
     }
 
+	public boolean hasProductVersion(int id_p, int vid) throws SQLException {
+		boolean result = false;
+		Statement stmt = null;
+		try {
+			stmt = con.createStatement();
+			result = stmt.execute("SELECT vid FROM download_com_product_versions " + "WHERE id_p = '" + id_p
+					+ "' AND vid = '" + vid + "'");
+
+		} catch (SQLException e) {
+			Database.printSQLException(e);
+		} finally {
+			if (stmt != null) {
+				stmt.close();
+			}
+		}
+		return result;
+	}
+
     public void updateProductVersion(int id_p, int vid, String version_name, String version_alterations,
                                      Date version_publish_date, Date version_added_date, String version_identifier,
                                      String operating_systems, String additional_requirements, String download_size,
@@ -29,8 +52,7 @@ public class ProductVersionTable {
         Statement stmt = null;
         try {
             stmt = con.createStatement();
-            if (!stmt.execute("SELECT vid FROM download_com_product_versions " + "WHERE id_p = '" + id_p
-                    + "' AND vid = '" + vid + "'")) {
+            if (!hasProductVersion(id_p, vid)) {
                 stmt.executeUpdate(
                         "INSERT INTO `download_com_product_versions`(`id_p`, `vid`, `version_name`, "
                                 + "`version_alterations`, `version_publish_date`, `version_added_date`, "
@@ -64,5 +86,4 @@ public class ProductVersionTable {
             }
         }
     }
-
 }

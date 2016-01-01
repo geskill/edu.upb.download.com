@@ -6,6 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * Created by geskill on 30.12.2015.
+ *
+ * @author geskill
+ */
 public class ProductTable {
 
 	private String dbName;
@@ -19,6 +24,23 @@ public class ProductTable {
 		this.dbms = dbmsArg;
 	}
 
+	public boolean hasProduct(int pid) throws SQLException {
+		boolean result = false;
+		Statement stmt = null;
+		try {
+			stmt = con.createStatement();
+			result = stmt.execute("SELECT pid FROM download_com_products " + "WHERE pid = '" + pid + "'");
+
+		} catch (SQLException e) {
+			Database.printSQLException(e);
+		} finally {
+			if (stmt != null) {
+				stmt.close();
+			}
+		}
+		return result;
+	}
+
 	public void updateProduct(int pid, int oid, String editors_review_name, Date editors_review_date,
 	                          String editors_review_description, String editors_review_text,
 	                          double editors_review_rating, double users_review_rating,
@@ -28,7 +50,7 @@ public class ProductTable {
 		Statement stmt = null;
 		try {
 			stmt = con.createStatement();
-			if (!stmt.execute("SELECT pid FROM download_com_products " + "WHERE pid = '" + pid + "'")) {
+			if (!hasProduct(pid)) {
 				stmt.executeUpdate(
 						"INSERT INTO `download_com_products`(`pid`, `oid`, `editors_review_name`, "
 								+ "`editors_review_date`, `editors_review_description`, `editors_review_text`, "
