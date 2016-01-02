@@ -1,0 +1,1 @@
+Place the connector file here and edit/check database.xml jar_file property.

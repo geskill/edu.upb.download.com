@@ -1,17 +1,14 @@
 package edu.upb.winfo.download.com;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.sql.*;
 import java.util.Properties;
 import java.util.*;
 import java.io.*;
-import java.sql.BatchUpdateException;
-import java.sql.DatabaseMetaData;
-import java.sql.RowIdLifetime;
-import java.sql.SQLWarning;
 
 public class Database {
 
@@ -79,8 +76,40 @@ public class Database {
 		System.out.println("portNumber: " + portNumber);
 	}
 
-	public Connection getConnection() throws SQLException {
+	private void doInit() throws SQLException {
 
+		final URLClassLoader loader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+
+		Method method = null;
+		try {
+			// some hacking
+			method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+			method.setAccessible(true);
+			method.invoke(loader, new File(this.jarFile).toURI().toURL());
+
+			Class<?> classToLoad = Class.forName(this.driver, true, loader);
+			Driver driver = (Driver) classToLoad.newInstance();
+			DriverManager.registerDriver(new DriverShim(driver));
+
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public Connection getConnection() throws SQLException {
+		this.doInit();
 		Connection conn = null;
 		Properties connectionProps = new Properties();
 		connectionProps.put("user", this.userName);
@@ -98,22 +127,21 @@ public class Database {
 	}
 
 	public Connection getConnectionToDatabase() throws SQLException {
-		{
-			Connection conn = null;
-			Properties connectionProps = new Properties();
-			connectionProps.put("user", this.userName);
-			connectionProps.put("password", this.password);
+		this.doInit();
+		Connection conn = null;
+		Properties connectionProps = new Properties();
+		connectionProps.put("user", this.userName);
+		connectionProps.put("password", this.password);
 
-			if (this.dbms.equals("mysql")) {
-				conn = DriverManager.getConnection(
-						"jdbc:" + dbms + "://" + serverName + ":" + portNumber + "/" + dbName, connectionProps);
-				conn.setCatalog(this.dbName);
-			} else if (this.dbms.equals("derby")) {
-				conn = DriverManager.getConnection("jdbc:" + dbms + ":" + dbName, connectionProps);
-			}
-			System.out.println("Connected to database");
-			return conn;
+		if (this.dbms.equals("mysql")) {
+			conn = DriverManager.getConnection(
+					"jdbc:" + dbms + "://" + serverName + ":" + portNumber + "/" + dbName, connectionProps);
+			conn.setCatalog(this.dbName);
+		} else if (this.dbms.equals("derby")) {
+			conn = DriverManager.getConnection("jdbc:" + dbms + ":" + dbName, connectionProps);
 		}
+		System.out.println("Connected to database");
+		return conn;
 	}
 
 	public static void closeConnection(Connection connArg) {
