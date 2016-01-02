@@ -1,8 +1,9 @@
-package edu.upb.winfo.download.com;
+package edu.upb.winfo.downloadcom;
+
+import edu.upb.winfo.utils.DatabaseConnection;
 
 import java.sql.Connection;
 import java.sql.Date;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -13,15 +14,11 @@ import java.sql.Statement;
  */
 public class ProductTable {
 
-	private String dbName;
 	private Connection con;
-	private String dbms;
 
-	public ProductTable(Connection connArg, String dbNameArg, String dbmsArg) {
+	public ProductTable(Connection connArg) {
 		super();
 		this.con = connArg;
-		this.dbName = dbNameArg;
-		this.dbms = dbmsArg;
 	}
 
 	public boolean hasProduct(int pid) throws SQLException {
@@ -32,7 +29,7 @@ public class ProductTable {
 			result = stmt.execute("SELECT pid FROM download_com_products " + "WHERE pid = '" + pid + "'");
 
 		} catch (SQLException e) {
-			Database.printSQLException(e);
+			DatabaseConnection.printSQLException(e);
 		} finally {
 			if (stmt != null) {
 				stmt.close();
@@ -76,7 +73,7 @@ public class ProductTable {
 			}
 
 		} catch (SQLException e) {
-			Database.printSQLException(e);
+			DatabaseConnection.printSQLException(e);
 		} finally {
 			if (stmt != null) {
 				stmt.close();

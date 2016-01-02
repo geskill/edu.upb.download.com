@@ -1,4 +1,4 @@
-package edu.upb.winfo.download.com;
+package edu.upb.winfo.utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -10,7 +10,12 @@ import java.util.Properties;
 import java.util.*;
 import java.io.*;
 
-public class Database {
+/**
+ * Created by geskill on 02.01.2016.
+ *
+ * @author geskill
+ */
+public class DatabaseConnection {
 
 	public String dbms;
 	public String jarFile;
@@ -24,18 +29,18 @@ public class Database {
 	private int portNumber;
 	private Properties prop;
 
-	public Database(String propertiesFileName)
+	public DatabaseConnection(String propertiesFileName)
 			throws FileNotFoundException, IOException, InvalidPropertiesFormatException {
 		super();
 		this.setProperties(propertiesFileName);
 	}
 
 	public static void getWarningsFromResultSet(ResultSet rs) throws SQLException {
-		Database.printWarnings(rs.getWarnings());
+		DatabaseConnection.printWarnings(rs.getWarnings());
 	}
 
 	public static void getWarningsFromStatement(Statement stmt) throws SQLException {
-		Database.printWarnings(stmt.getWarnings());
+		DatabaseConnection.printWarnings(stmt.getWarnings());
 	}
 
 	public static void printWarnings(SQLWarning warning) throws SQLException {

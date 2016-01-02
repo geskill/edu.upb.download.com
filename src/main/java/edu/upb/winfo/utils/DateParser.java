@@ -1,4 +1,4 @@
-package edu.upb.winfo.download.com;
+package edu.upb.winfo.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

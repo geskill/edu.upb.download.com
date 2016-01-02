@@ -1,4 +1,4 @@
-package edu.upb.winfo.download.com;
+package edu.upb.winfo.downloadcom;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

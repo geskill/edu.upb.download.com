@@ -1,7 +1,7 @@
 /**
  *
  */
-package edu.upb.winfo.download.com;
+package edu.upb.winfo.downloadcom;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -12,9 +12,10 @@ import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
+import edu.upb.winfo.utils.DateParser;
+import edu.upb.winfo.utils.RegEx;
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by geskill on 30.12.2015.

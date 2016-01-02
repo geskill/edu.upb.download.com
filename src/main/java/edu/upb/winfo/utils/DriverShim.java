@@ -1,4 +1,4 @@
-package edu.upb.winfo.download.com;
+package edu.upb.winfo.utils;
 
 import java.sql.*;
 import java.util.Properties;

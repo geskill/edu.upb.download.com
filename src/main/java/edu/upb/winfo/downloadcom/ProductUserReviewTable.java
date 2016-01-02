@@ -1,8 +1,9 @@
-package edu.upb.winfo.download.com;
+package edu.upb.winfo.downloadcom;
+
+import edu.upb.winfo.utils.DatabaseConnection;
 
 import java.sql.Connection;
 import java.sql.Date;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -13,15 +14,29 @@ import java.sql.Statement;
  */
 public class ProductUserReviewTable {
 
-	private String dbName;
 	private Connection con;
-	private String dbms;
 
-	public ProductUserReviewTable(Connection connArg, String dbNameArg, String dbmsArg) {
+	public ProductUserReviewTable(Connection connArg) {
 		super();
 		this.con = connArg;
-		this.dbName = dbNameArg;
-		this.dbms = dbmsArg;
+	}
+
+	public boolean hasProductUserReview(int mid, int id_p, int id_v) throws SQLException {
+		boolean result = false;
+		Statement stmt = null;
+		try {
+			stmt = con.createStatement();
+			result = stmt.execute("SELECT mid FROM download_com_product_user_reviews " + "WHERE mid = '" + mid
+					+ "' AND id_p = '" + id_p + "' AND id_v = '" + id_v + "'");
+
+		} catch (SQLException e) {
+			DatabaseConnection.printSQLException(e);
+		} finally {
+			if (stmt != null) {
+				stmt.close();
+			}
+		}
+		return result;
 	}
 
 	public void updateProductUserReview(int mid, int id_p, int id_v, double rating, String title, String author,
@@ -30,8 +45,7 @@ public class ProductUserReviewTable {
 		Statement stmt = null;
 		try {
 			stmt = con.createStatement();
-			if (!stmt.execute("SELECT mid FROM download_com_product_user_reviews " + "WHERE mid = '" + mid
-					+ "' AND id_p = '" + id_p + "' AND id_v = '" + id_v + "'")) {
+			if (!hasProductUserReview(mid, id_p, id_v)) {
 				stmt.executeUpdate(
 						"INSERT INTO `download_com_product_user_reviews`(`mid`, `id_p`, `id_v`, `rating`, `title`, "
 								+ "`author`, `date`, `pros`, `cons`, `summary`, `thumbs_up`, `thumbs_down`) "
@@ -47,7 +61,7 @@ public class ProductUserReviewTable {
 			}
 
 		} catch (SQLException e) {
-			Database.printSQLException(e);
+			DatabaseConnection.printSQLException(e);
 		} finally {
 			if (stmt != null) {
 				stmt.close();

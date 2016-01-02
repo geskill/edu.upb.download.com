@@ -1,8 +1,9 @@
-package edu.upb.winfo.download.com;
+package edu.upb.winfo.downloadcom;
+
+import edu.upb.winfo.utils.DatabaseConnection;
 
 import java.sql.Connection;
 import java.sql.Date;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -13,15 +14,11 @@ import java.sql.Statement;
  */
 public class ProductVersionTable {
 
-    private String dbName;
     private Connection con;
-    private String dbms;
 
-    public ProductVersionTable(Connection connArg, String dbNameArg, String dbmsArg) {
+    public ProductVersionTable(Connection connArg) {
         super();
         this.con = connArg;
-        this.dbName = dbNameArg;
-        this.dbms = dbmsArg;
     }
 
 	public boolean hasProductVersion(int id_p, int vid) throws SQLException {
@@ -33,7 +30,7 @@ public class ProductVersionTable {
 					+ "' AND vid = '" + vid + "'");
 
 		} catch (SQLException e) {
-			Database.printSQLException(e);
+			DatabaseConnection.printSQLException(e);
 		} finally {
 			if (stmt != null) {
 				stmt.close();
@@ -79,7 +76,7 @@ public class ProductVersionTable {
             }
 
         } catch (SQLException e) {
-            Database.printSQLException(e);
+            DatabaseConnection.printSQLException(e);
         } finally {
             if (stmt != null) {
                 stmt.close();

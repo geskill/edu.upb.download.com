@@ -1,36 +1,42 @@
-package edu.upb.winfo.download.com;
+package edu.upb.winfo.downloadcom;
 
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
+import edu.upb.winfo.utils.DatabaseConnection;
 
 /**
  * Created by geskill on 30.12.2015.
+ *
+ * crawler4j has some issues, that hinder the crawler to be more efficient
+ * https://github.com/yasserg/crawler4j/issues/16
+ *
+ * https://github.com/yasserg/crawler4j/issues/108
  *
  * @author geskill
  */
 public class App {
 	public static void main(String[] args) throws Exception {
 
-		Database database = new Database("data/config/database.xml");
-
-		// database.getConnectionToDatabase();
+		// TODO: future versions implement a remote database to use the crawler from different tiers
+		DatabaseInterface databaseInterface = new LocalDatabase("data/config/databaseConnection.xml");
 
 		String crawlStorageFolder = "data/crawl/root/";
 		int numberOfCrawlers = 7;
 
-		CrawlConfig config = new CrawlConfig();
-		config.setCrawlStorageFolder(crawlStorageFolder);
+		CrawlConfig crawlConfig = new CrawlConfig();
+		crawlConfig.setCrawlStorageFolder(crawlStorageFolder);
+		crawlConfig.setResumableCrawling(true);
 
         /*
          * Instantiate the controller for this crawl.
          */
-		PageFetcher pageFetcher = new PageFetcher(config);
+		PageFetcher pageFetcher = new PageFetcher(crawlConfig);
 		RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
 		RobotstxtServer robotstxtServer = new RobotstxtServer(robotstxtConfig, pageFetcher);
-		CrawlController controller = new CrawlController(config, pageFetcher, robotstxtServer);
+		CrawlController controller = new CrawlController(crawlConfig, pageFetcher, robotstxtServer);
 
         /*
          * For each crawl, you need to add some seed urls. These are the first

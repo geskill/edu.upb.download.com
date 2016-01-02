@@ -1,4 +1,4 @@
-package edu.upb.winfo.download.com;
+package edu.upb.winfo.utils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
