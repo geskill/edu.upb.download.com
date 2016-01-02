@@ -28,6 +28,7 @@ public interface DatabaseInterface {
 	 * @param users_review_rating
 	 * @param users_review_rating_count
 	 * @param publisher_description
+	 * @param publisher_description_alterations
 	 * @param publisher_name
 	 * @param publisher_url
 	 * @param platform
@@ -36,9 +37,9 @@ public interface DatabaseInterface {
 	 * @param latest_id_v
 	 */
 	void updateProduct(int pid, int oid, String editors_review_name, Date editors_review_date,
-	                   String editors_review_description, String editors_review_text,
-	                   double editors_review_rating, double users_review_rating,
-	                   int users_review_rating_count, String publisher_description, String publisher_name,
+	                   String editors_review_description, String editors_review_text, double editors_review_rating,
+	                   double users_review_rating, int users_review_rating_count, String publisher_description,
+	                   String publisher_description_alterations, String publisher_name,
 	                   String publisher_url, String platform, String category,
 	                   String subcategory, int latest_id_v);
 

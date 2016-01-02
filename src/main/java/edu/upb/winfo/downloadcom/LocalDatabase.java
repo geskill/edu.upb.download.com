@@ -85,6 +85,7 @@ public class LocalDatabase implements DatabaseInterface {
 	 * @param users_review_rating
 	 * @param users_review_rating_count
 	 * @param publisher_description
+	 * @param publisher_description_alterations
 	 * @param publisher_name
 	 * @param publisher_url
 	 * @param platform
@@ -92,16 +93,24 @@ public class LocalDatabase implements DatabaseInterface {
 	 * @param subcategory
 	 * @param latest_id_v
 	 */
-	public void updateProduct(int pid, int oid, String editors_review_name, Date editors_review_date, String
-			editors_review_description, String editors_review_text, double editors_review_rating, double
-			users_review_rating, int users_review_rating_count, String publisher_description, String publisher_name,
-	                          String publisher_url, String platform, String category, String subcategory, int
-			                          latest_id_v) {
+	public void updateProduct(int pid, int oid, String editors_review_name, Date editors_review_date,
+	                          String editors_review_description, String editors_review_text,
+	                          double editors_review_rating, double users_review_rating, int users_review_rating_count,
+	                          String publisher_description, String publisher_description_alterations,
+	                          String publisher_name, String publisher_url, String platform, String category,
+	                          String subcategory, int latest_id_v) {
+
+		java.sql.Date sql_editors_review_date = null;
+
+		if (editors_review_date != null) {
+			sql_editors_review_date = new java.sql.Date(editors_review_date.getTime());
+		}
+
 		try {
-			this.productTable.updateProduct(pid, oid, editors_review_name, new java.sql.Date(editors_review_date
-					.getTime()), editors_review_description, editors_review_text, editors_review_rating,
-					users_review_rating, users_review_rating_count, publisher_description, publisher_name,
-					publisher_url, platform, category, subcategory, latest_id_v);
+			this.productTable.updateProduct(pid, oid, editors_review_name, sql_editors_review_date,
+					editors_review_description, editors_review_text, editors_review_rating, users_review_rating,
+					users_review_rating_count, publisher_description, publisher_description_alterations,
+					publisher_name, publisher_url, platform, category, subcategory, latest_id_v);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -147,12 +156,22 @@ public class LocalDatabase implements DatabaseInterface {
 			additional_requirements, String download_size, String download_name, String download_link, int
 			downloads_total, int downloads_last_week, String license_model, String license_limitations, String
 			license_cost) {
+
+		java.sql.Date sql_version_publish_date = null;
+		java.sql.Date sql_version_added_date = null;
+
+		if (version_publish_date != null) {
+			sql_version_publish_date = new java.sql.Date(version_publish_date.getTime());
+		}
+		if (version_added_date != null) {
+			sql_version_added_date = new java.sql.Date(version_added_date.getTime());
+		}
+
 		try {
-			this.productVersionTable.updateProductVersion(id_p, vid, version_name, version_alterations, new java.sql
-					.Date(version_publish_date.getTime()), new java.sql.Date(version_added_date.getTime()),
-					version_identifier, operating_systems, additional_requirements, download_size, download_name,
-					download_link, downloads_total, downloads_last_week, license_model, license_limitations,
-					license_cost);
+			this.productVersionTable.updateProductVersion(id_p, vid, version_name, version_alterations,
+					sql_version_publish_date, sql_version_added_date, version_identifier, operating_systems,
+					additional_requirements, download_size, download_name, download_link, downloads_total,
+					downloads_last_week, license_model, license_limitations, license_cost);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -191,9 +210,16 @@ public class LocalDatabase implements DatabaseInterface {
 	 */
 	public void updateProductUserReview(int mid, int id_p, int id_v, double rating, String title, String author, Date
 			date, String pros, String cons, String summary, int thumbs_up, int thumbs_down) {
+
+		java.sql.Date sql_date = null;
+
+		if (date != null) {
+			sql_date = new java.sql.Date(date.getTime());
+		}
+
 		try {
-			this.productUserReviewTable.updateProductUserReview(mid, id_p, id_v, rating, title, author, new java.sql
-					.Date(date.getTime()), pros, cons, summary, thumbs_up, thumbs_down);
+			this.productUserReviewTable.updateProductUserReview(mid, id_p, id_v, rating, title, author, sql_date,
+					pros, cons, summary, thumbs_up, thumbs_down);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

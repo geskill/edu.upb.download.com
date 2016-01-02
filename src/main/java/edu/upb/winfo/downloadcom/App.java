@@ -30,6 +30,7 @@ public class App {
 		crawlConfig.setCrawlStorageFolder(crawlStorageFolder);
 		crawlConfig.setResumableCrawling(true);
 		crawlConfig.setUserAgentString(RandomUserAgent.generate());
+		crawlConfig.setPolitenessDelay(1000);
 
         /*
          * Instantiate the controller for this crawl.

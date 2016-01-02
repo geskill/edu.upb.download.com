@@ -2,10 +2,7 @@ package edu.upb.winfo.downloadcom;
 
 import edu.upb.winfo.utils.DatabaseConnection;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 /**
  * Created by geskill on 30.12.2015.
@@ -22,11 +19,16 @@ public class ProductTable {
 	}
 
 	public boolean hasProduct(int pid) throws SQLException {
-		boolean result = false;
-		Statement stmt = null;
+		int count = 0;
+		PreparedStatement stmt = null;
+		ResultSet rset = null;
 		try {
-			stmt = con.createStatement();
-			result = stmt.execute("SELECT pid FROM download_com_products " + "WHERE pid = '" + pid + "'");
+			stmt = con.prepareStatement("SELECT count(*) FROM `download_com_products` WHERE `pid`=?");
+			stmt.setInt(1, pid);
+			rset = stmt.executeQuery();
+			if (rset.next()) {
+				count = rset.getInt(1);
+			}
 
 		} catch (SQLException e) {
 			DatabaseConnection.printSQLException(e);
@@ -35,42 +37,82 @@ public class ProductTable {
 				stmt.close();
 			}
 		}
-		return result;
+		return count > 0;
 	}
 
 	public void updateProduct(int pid, int oid, String editors_review_name, Date editors_review_date,
 	                          String editors_review_description, String editors_review_text,
 	                          double editors_review_rating, double users_review_rating,
-	                          int users_review_rating_count, String publisher_description, String publisher_name,
-	                          String publisher_url, String platform, String category,
-	                          String subcategory, int latest_id_v) throws SQLException {
-		Statement stmt = null;
+	                          int users_review_rating_count, String publisher_description,
+	                          String publisher_description_alterations, String publisher_name, String publisher_url,
+	                          String platform, String category, String subcategory,
+	                          int latest_id_v) throws SQLException {
+		int index = 1;
+		String query = "";
+		PreparedStatement stmt = null;
 		try {
-			stmt = con.createStatement();
 			if (!hasProduct(pid)) {
-				stmt.executeUpdate(
-						"INSERT INTO `download_com_products`(`pid`, `oid`, `editors_review_name`, "
-								+ "`editors_review_date`, `editors_review_description`, `editors_review_text`, "
-								+ "`editors_review_rating`, `users_review_rating`, `users_review_rating_count`, "
-								+ "`publisher_description`, `publisher_name`, `publisher_url`, `platform`, "
-								+ "`category`, `subcategory`, `latest_id_v`) "
-								+ "VALUES('" + pid + "', '" + oid + "', '" + editors_review_name + "', '"
-								+ editors_review_date + "', '" + editors_review_description + "', '"
-								+ editors_review_text + "', '" + editors_review_rating + "', '" + users_review_rating
-								+ "', '" + users_review_rating_count + "', '" + publisher_description + "', '"
-								+ publisher_name + "', '" + publisher_url + "', '" + platform
-								+ "', '" + category + "', '" + subcategory + "', '" + latest_id_v + "')");
+				query = "INSERT INTO `download_com_products`(`pid`, `oid`, `editors_review_name`, " +
+						"`editors_review_date`, `editors_review_description`, `editors_review_text`, " +
+						"`editors_review_rating`, `users_review_rating`, `users_review_rating_count`, " +
+						"`publisher_description`, `publisher_description_alterations`, `publisher_name`, " +
+						"`publisher_url`, `platform`, `category`, `subcategory`, `latest_id_v`) VALUES (?,?,?,?,?,?,?," +
+						"?,?,?,?,?,?,?,?,?,?)";
+				stmt = con.prepareStatement(query);
+				stmt.setInt(index++, pid);
+				stmt.setInt(index++, oid);
+				stmt.setString(index++, editors_review_name);
+				if (editors_review_date == null) {
+					stmt.setNull(index++, Types.DATE);
+				} else {
+					stmt.setDate(index++, editors_review_date);
+				}
+				stmt.setString(index++, editors_review_description);
+				stmt.setString(index++, editors_review_text);
+				stmt.setDouble(index++, editors_review_rating);
+				stmt.setDouble(index++, users_review_rating);
+				stmt.setInt(index++, users_review_rating_count);
+				stmt.setString(index++, publisher_description);
+				stmt.setString(index++, publisher_description_alterations);
+				stmt.setString(index++, publisher_name);
+				stmt.setString(index++, publisher_url);
+				stmt.setString(index++, platform);
+				stmt.setString(index++, category);
+				stmt.setString(index++, subcategory);
+				stmt.setInt(index++, latest_id_v);
+
 			} else {
-				stmt.executeUpdate("UPDATE `download_com_products` SET `oid`='" + oid + "',`editors_review_name`='"
-						+ editors_review_name + "',`editors_review_date`='" + editors_review_date
-						+ "',`editors_review_description`='" + editors_review_description + "',`editors_review_text`='"
-						+ editors_review_text + "',`editors_review_rating`='" + editors_review_rating
-						+ "',`users_review_rating`='" + users_review_rating + "',`users_review_rating_count`='"
-						+ users_review_rating_count + "',`publisher_description`='" + publisher_description
-						+ "',`publisher_name`='" + publisher_name + "',`publisher_url`='" + publisher_url
-						+ "',`platform`='" + platform + "',`category`='" + category + "',`subcategory`='"
-						+ subcategory + "',`latest_id_v`='" + latest_id_v + "' WHERE pid = '" + pid + "'");
+				query = "UPDATE `download_com_products` SET `oid`=?,`editors_review_name`=?,`editors_review_date`=?," +
+						"`editors_review_description`=?,`editors_review_text`=?,`editors_review_rating`=?," +
+						"`users_review_rating`=?,`users_review_rating_count`=?,`publisher_description`=?," +
+						"`publisher_description_alterations`=?,`publisher_name`=?,`publisher_url`=?,`platform`=?," +
+						"`category`=?,`subcategory`=?,`latest_id_v`=? WHERE `pid`=?";
+				stmt = con.prepareStatement(query);
+				stmt.setInt(index++, oid);
+				stmt.setString(index++, editors_review_name);
+				if (editors_review_date == null) {
+					stmt.setNull(index++, Types.DATE);
+				} else {
+					stmt.setDate(index++, editors_review_date);
+				}
+				stmt.setString(index++, editors_review_description);
+				stmt.setString(index++, editors_review_text);
+				stmt.setDouble(index++, editors_review_rating);
+				stmt.setDouble(index++, users_review_rating);
+				stmt.setInt(index++, users_review_rating_count);
+				stmt.setString(index++, publisher_description);
+				stmt.setString(index++, publisher_description_alterations);
+				stmt.setString(index++, publisher_name);
+				stmt.setString(index++, publisher_url);
+				stmt.setString(index++, platform);
+				stmt.setString(index++, category);
+				stmt.setString(index++, subcategory);
+				stmt.setInt(index++, latest_id_v);
+				stmt.setInt(index++, pid);
+
 			}
+			System.out.println("query: " + stmt);
+			stmt.executeUpdate();
 
 		} catch (SQLException e) {
 			DatabaseConnection.printSQLException(e);

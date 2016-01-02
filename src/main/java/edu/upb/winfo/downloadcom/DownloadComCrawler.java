@@ -1,7 +1,9 @@
 package edu.upb.winfo.downloadcom;
 
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import edu.uci.ics.crawler4j.crawler.Page;
@@ -38,6 +40,9 @@ public class DownloadComCrawler extends WebCrawler {
 	 *
 	 * http://download.cnet.com/ccleaner/
 	 * http://download.cnet.com/archive/3000-18512_4-14488690.html
+	 *
+	 *
+	 * /3000-2239_4-14488453.html?messageID=10998418
 	 */
 	@Override
 	public boolean shouldVisit(Page referringPage, WebURL url) {
@@ -96,7 +101,9 @@ public class DownloadComCrawler extends WebCrawler {
 	private static final Pattern USERS_REVIEW_RATING_COUNT = Pattern.compile("user-reviews-stars[\\s\\S]*?out of (\\d+) votes");
 
 	private static final Pattern PUBLISHER_DESCRIPTION = Pattern.compile("publisher-description[\\s\\S]*?<\\/span>[\\s\\S]*?<\\/span>([\\s\\S]*?)<div");
-	// TODO: whats new of product
+	// INFO: some broken HTML at "See all new features"
+	private static final Pattern PUBLISHER_DESCRIPTION_ALTERATIONS = Pattern.compile("publisher-description[\\s\\S]*?\"whatsnew\"[\\s\\S]*?<\\/p>([\\s\\S]*?)(<\\/div|<a)");
+
 	private static final Pattern PUBLISHER_NAME = Pattern.compile("specsPubName[\\s\\S]*?Publisher[\\s\\S]*?>(.*?)<");
 	private static final Pattern PUBLISHER_URL = Pattern.compile("specsPubName[\\s\\S]*?Publisher[\\s\\S]*?href=\"(.*?)\"");
 
@@ -121,6 +128,7 @@ public class DownloadComCrawler extends WebCrawler {
 		double users_review_rating = Double.parseDouble(RegEx.getMatch(USERS_REVIEW_RATING, pageContent));
 		int users_review_rating_count = Integer.parseInt(RegEx.getMatch(USERS_REVIEW_RATING_COUNT, pageContent));
 		String publisher_description = RegEx.getMatch(PUBLISHER_DESCRIPTION, pageContent);
+		String publisher_description_alterations = RegEx.getMatch(PUBLISHER_DESCRIPTION_ALTERATIONS, pageContent);
 		String publisher_name = RegEx.getMatch(PUBLISHER_NAME, pageContent);
 		String publisher_url = RegEx.getMatch(PUBLISHER_URL, pageContent);
 		String platform = RegEx.getMatch(PLATFORM, pageContent);
@@ -148,7 +156,8 @@ public class DownloadComCrawler extends WebCrawler {
 
 		App.DATABASE.updateProduct(pid, oid, editors_review_name, editors_review_date, editors_review_description,
 				editors_review_text, editors_review_rating, users_review_rating, users_review_rating_count,
-				publisher_description, publisher_name, publisher_url, platform, category, subcategory, latest_id_v);
+				publisher_description, publisher_description_alterations, publisher_name, publisher_url, platform,
+				category, subcategory, latest_id_v);
 	}
 
 	// Product version
@@ -199,8 +208,18 @@ public class DownloadComCrawler extends WebCrawler {
 		String download_size = RegEx.getMatch(DOWNLOAD_SIZE, pageContent);
 		String download_name = RegEx.getMatch(DOWNLOAD_NAME, pageContent);
 		String download_link = RegEx.getMatch(DOWNLOAD_LINK, pageContent);
-		int downloads_total = Integer.parseInt(RegEx.getMatch(DOWNLOADS_TOTAL, pageContent));
-		int downloads_last_week = Integer.parseInt(RegEx.getMatch(DOWNLOADS_LAST_WEEK, pageContent));
+		int downloads_total = 0;
+		try {
+			downloads_total = NumberFormat.getNumberInstance(Locale.US).parse(RegEx.getMatch(DOWNLOADS_TOTAL, pageContent)).intValue();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		int downloads_last_week = 0;
+		try {
+			downloads_last_week = NumberFormat.getNumberInstance(Locale.US).parse(RegEx.getMatch(DOWNLOADS_LAST_WEEK, pageContent)).intValue();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 		String license_model = RegEx.getMatch(LICENSE_MODEL, pageContent);
 		String license_limitations = RegEx.getMatch(LICENSE_LIMITATIONS, pageContent);
 		String license_cost = RegEx.getMatch(LICENSE_COST, pageContent);
@@ -221,7 +240,7 @@ public class DownloadComCrawler extends WebCrawler {
 	private static final Pattern RATING = Pattern.compile("<span>([\\d\\.]+) stars");
 	private static final Pattern TITLE = Pattern.compile("\"title\">(.*?)<\\/");
 	private static final Pattern AUTHOR = Pattern.compile("\"author\">[\\s\\S]*?\"> (.*?)<");
-	private static final Pattern DATE = Pattern.compile("\"author\">\\s+(.*?)\\s+&nbsp;");
+	private static final Pattern DATE = Pattern.compile("\"author\">\\s+(.*?)\\s+(&nbsp;|<)");
 
 	private static final Pattern PROS = Pattern.compile("Pros<\\/p>.*?\">([\\s\\S]*?)<\\/p>");
 	private static final Pattern CONS = Pattern.compile("Cons<\\/p>.*?\">([\\s\\S]*?)<\\/p>");
@@ -235,7 +254,7 @@ public class DownloadComCrawler extends WebCrawler {
 		Matcher m = MESSAGE_CONTAINER.matcher(pageContent);
 		while(m.find()) {
 
-			String message = m.group(1);
+			String message = "messageId" + m.group(1);
 
 			int mid = Integer.parseInt(RegEx.getMatch(MID, message));
 			int id_p = Integer.parseInt(RegEx.getMatch(ID_P, pageContent));

@@ -3,6 +3,7 @@ package edu.upb.winfo.utils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by geskill on 01.01.2016.
@@ -12,7 +13,8 @@ import java.util.Date;
 public class DateParser {
 
 	// "November 04, 2015"
-	private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMMMM dd, yyyy");
+	// INFO: Locale is US
+	private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMMMM dd, yyyy", Locale.US);
 
 	public static Date getDate(String date) throws ParseException {
 
