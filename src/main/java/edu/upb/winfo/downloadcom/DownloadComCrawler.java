@@ -24,8 +24,7 @@ import java.util.regex.Matcher;
  */
 public class DownloadComCrawler extends WebCrawler {
 
-	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|gif|jpg"
-			+ "|png|mp3|mp3|zip|gz))$");
+	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|gif|gz|jpg|js|mp3|png|xml|zip))$");
 
 	/**
 	 * This method receives two parameters. The first parameter is the page
@@ -36,12 +35,20 @@ public class DownloadComCrawler extends WebCrawler {
 	 * have css, js, git, ... extensions and to only accept urls that start
 	 * with "http://www.ics.uci.edu/". In this case, we didn't need the
 	 * referringPage parameter to make the decision.
+	 *
+	 *
+	 * http://download.cnet.com/Avast-Free-Antivirus-2016/3000-2239_4-10019223.html
+	 * http://download.cnet.com/archive/3000-2239_4-14477201.html
+	 *
+	 * http://download.cnet.com/ccleaner/
+	 * http://download.cnet.com/archive/3000-18512_4-14488690.html
 	 */
 	@Override
 	public boolean shouldVisit(Page referringPage, WebURL url) {
 		String href = url.getURL().toLowerCase();
-		return !FILTERS.matcher(href).matches()
-				&& href.startsWith("http://download.cnet.com/");
+		return !FILTERS.matcher(href).matches() && href.startsWith("http://download.cnet.com/")
+				&& !href.startsWith("http://download.cnet.com/blog/")
+				&& !href.startsWith("http://download.cnet.com/security-center/");
 	}
 
 	/**
