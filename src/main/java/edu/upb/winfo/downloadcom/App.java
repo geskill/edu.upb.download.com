@@ -44,6 +44,12 @@ public class App {
          * which are found in these pages
          */
 		controller.addSeed("http://download.cnet.com/");
+		controller.addSeed("http://download.cnet.com/windows/");
+		controller.addSeed("http://download.cnet.com/mac/");
+		controller.addSeed("http://download.cnet.com/webware/");
+		controller.addSeed("http://download.cnet.com/ios/");
+		controller.addSeed("http://download.cnet.com/android/");
+		controller.addSeed("http://download.cnet.com/mobile/");
 
         /*
          * Start the crawl. This is a blocking operation, meaning that your code
