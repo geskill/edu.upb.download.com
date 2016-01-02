@@ -14,7 +14,7 @@ public class RegEx {
 
 		Matcher m = pattern.matcher(input);
 		if (m.find()) {
-			return m.group(1);
+			return m.group(1).trim();
 		}
 		return "";
 	}

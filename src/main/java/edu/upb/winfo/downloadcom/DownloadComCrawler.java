@@ -1,11 +1,7 @@
-/**
- *
- */
 package edu.upb.winfo.downloadcom;
 
 import java.text.ParseException;
 import java.util.Date;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import edu.uci.ics.crawler4j.crawler.Page;
@@ -49,6 +45,8 @@ public class DownloadComCrawler extends WebCrawler {
 		return !FILTERS.matcher(href).matches() && href.startsWith("http://download.cnet.com/")
 				&& !href.startsWith("http://download.cnet.com/blog/")
 				&& !href.startsWith("http://download.cnet.com/security-center/");
+
+		// TODO: Remote database should check if the entry exists (if possible [exception i.e. /ccleaner/])
 	}
 
 	/**
@@ -62,17 +60,27 @@ public class DownloadComCrawler extends WebCrawler {
 
 		if (page.getParseData() instanceof HtmlParseData) {
 			HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
-			String text = htmlParseData.getText();
 			String html = htmlParseData.getHtml();
-			Set<WebURL> links = htmlParseData.getOutgoingUrls();
 
-			System.out.println("Text length: " + text.length());
-			System.out.println("Html length: " + html.length());
-			System.out.println("Number of outgoing links: " + links.size());
+			if (this.hasProduct(html)) {
+				this.handleProduct(html);
+				this.handleProductVersion(html);
+				this.handleUserReviews(html);
+			}
+
+			// TODO: handle ajax user reviews from others than first page
 		}
 	}
 
+	private static final String IS_PRODUCT_PAGE = "\"ptype\": \"product_detail\"";
+
+	protected boolean hasProduct(String pageContent) {
+		return pageContent.contains(IS_PRODUCT_PAGE);
+	}
+
 	// Product
+
+	private static final Pattern OIDString = Pattern.compile("data-oid=\"(.*?)\"");
 
 	private static final Pattern PID = Pattern.compile("softwareProductId:\"(\\d+)\"");
 	private static final Pattern OID = Pattern.compile("pageOntologyId:\"(\\d+)\"");
@@ -80,7 +88,7 @@ public class DownloadComCrawler extends WebCrawler {
 	private static final Pattern EDITORS_REVIEW_NAME = Pattern.compile("editor-review[\\s\\S]*?itemprop=\\\"name\\\">(.*?)<\\/span>");
 	private static final Pattern EDITORS_REVIEW_DATE = Pattern.compile("editor-review[\\s\\S]*?<\\/a>\\s+on (.*?)\\s+<\\/");
 	private static final Pattern EDITORS_REVIEW_DESCRIPTION = Pattern.compile("editor-review[\\s\\S]*?itemprop=\\\"description\\\".*?>\\s+<p>(.*?)<\\/");
-	private static final Pattern EDITORS_REVIEW_TEXT = Pattern.compile("editor-review[\\s\\S]*?itemprop=\\\"description\\\"[\\s\\S]*?<\\/p><p>([\\s\\S]*?)<\\/div>");
+	private static final Pattern EDITORS_REVIEW_TEXT = Pattern.compile("editor-review[\\s\\S]*?itemprop=\\\"description\\\"[\\s\\S]*?<\\/p>([\\s\\S]*?)<\\/div>");
 	private static final Pattern EDITORS_REVIEW_RATING = Pattern.compile("editor-reviews-stars[\\s\\S]*?<span>([\\d\\.]+)<\\/span>");
 
 	private static final Pattern USERS_REVIEW_RATING = Pattern.compile("user-reviews-stars[\\s\\S]*?\"ratingValue\">([\\d\\.]+)<\\/span>");
@@ -88,21 +96,22 @@ public class DownloadComCrawler extends WebCrawler {
 	private static final Pattern USERS_REVIEW_RATING_COUNT = Pattern.compile("user-reviews-stars[\\s\\S]*?out of (\\d+) votes");
 
 	private static final Pattern PUBLISHER_DESCRIPTION = Pattern.compile("publisher-description[\\s\\S]*?<\\/span>[\\s\\S]*?<\\/span>([\\s\\S]*?)<div");
+	// TODO: whats new of product
 	private static final Pattern PUBLISHER_NAME = Pattern.compile("specsPubName[\\s\\S]*?Publisher[\\s\\S]*?>(.*?)<");
 	private static final Pattern PUBLISHER_URL = Pattern.compile("specsPubName[\\s\\S]*?Publisher[\\s\\S]*?href=\"(.*?)\"");
 
 	private static final Pattern PLATFORM = Pattern.compile("breadcrumb\"[\\s\\S]*?href=\\/.*?\\/\\?tag=bc>(.*?)<\\/a>");
 	private static final Pattern CATEGORY = Pattern.compile("specsCategory[\\s\\S]*?Category[\\s\\S]*?\">(.*?)<");
 	private static final Pattern SUBCATEGORY = Pattern.compile("specsSubcategory[\\s\\S]*?Subcategory[\\s\\S]*?\">(.*?)<");
-	private static final Pattern LATEST_ID_V = Pattern.compile(""); // TODO: add
 
-	public void handleProduct(String pageContent) {
+	protected void handleProduct(String pageContent) {
 
 		int pid = Integer.parseInt(RegEx.getMatch(PID, pageContent));
 		int oid = Integer.parseInt(RegEx.getMatch(OID, pageContent));
 		String editors_review_name = RegEx.getMatch(EDITORS_REVIEW_NAME, pageContent);
+		Date editors_review_date = null;
 		try {
-			Date editors_review_date = DateParser.getDate(RegEx.getMatch(EDITORS_REVIEW_DATE, pageContent));
+			editors_review_date = DateParser.getDate(RegEx.getMatch(EDITORS_REVIEW_DATE, pageContent));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -117,11 +126,29 @@ public class DownloadComCrawler extends WebCrawler {
 		String platform = RegEx.getMatch(PLATFORM, pageContent);
 		String category = RegEx.getMatch(CATEGORY, pageContent);
 		String subcategory = RegEx.getMatch(SUBCATEGORY, pageContent);
-		int latest_id_v = Integer.parseInt(RegEx.getMatch(LATEST_ID_V, pageContent)); // TODO: compare
 
-		// TODO: Add to database
+		int latest_id_v = -1;
+		String oid_string = RegEx.getMatch(OIDString, pageContent);
+		if (oid_string.contains(Integer.toString(pid))) {
 
-		// TODO: Add seeds
+			// Newest version:
+			// download.cnet.com/Avast-Free-Antivirus-2016/3000-2239_4-10019223.html
+			// softwareProductId:"10019223"
+			// data-oid="3000-2239_4-10019223"
+			// softwareId:"14488453"
+
+			// Any older version:
+			// download.cnet.com/archive/3000-2239_4-14477201.html
+			// softwareProductId:"10019223"
+			// data-oid="3000-2239_4-14477201"
+			// softwareId:"14477201"
+
+			latest_id_v = Integer.parseInt(RegEx.getMatch(VID, pageContent));
+		}
+
+		App.DATABASE.updateProduct(pid, oid, editors_review_name, editors_review_date, editors_review_description,
+				editors_review_text, editors_review_rating, users_review_rating, users_review_rating_count,
+				publisher_description, publisher_name, publisher_url, platform, category, subcategory, latest_id_v);
 	}
 
 	// Product version
@@ -148,19 +175,21 @@ public class DownloadComCrawler extends WebCrawler {
 	private static final Pattern LICENSE_LIMITATIONS = Pattern.compile("specsLimitations[\\s\\S]*?Limitations[\\s\\S]*?<td>([\\s\\S]*?)<");
 	private static final Pattern LICENSE_COST = Pattern.compile("specsPrice[\\s\\S]*?Price[\\s\\S]*?<td>([\\s\\S]*?)<");
 
-	public void handleProductVersion(String pageContent) {
+	protected void handleProductVersion(String pageContent) {
 
 		int id_p = Integer.parseInt(RegEx.getMatch(PID, pageContent));
 		int vid = Integer.parseInt(RegEx.getMatch(VID, pageContent));
 		String version_name = RegEx.getMatch(VERSION_NAME, pageContent);
 		String version_alterations = RegEx.getMatch(VERSION_ALTERATIONS, pageContent);
+		Date version_publish_date = null;
 		try {
-			Date version_publish_date = DateParser.getDate(RegEx.getMatch(VERSION_PUBLISH_DATE, pageContent));
+			version_publish_date = DateParser.getDate(RegEx.getMatch(VERSION_PUBLISH_DATE, pageContent));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+		Date version_added_date = null;
 		try {
-			Date version_added_date = DateParser.getDate(RegEx.getMatch(VERSION_ADDED_DATE, pageContent));
+			version_added_date = DateParser.getDate(RegEx.getMatch(VERSION_ADDED_DATE, pageContent));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -176,9 +205,10 @@ public class DownloadComCrawler extends WebCrawler {
 		String license_limitations = RegEx.getMatch(LICENSE_LIMITATIONS, pageContent);
 		String license_cost = RegEx.getMatch(LICENSE_COST, pageContent);
 
-		// TODO: Add to database
-
-		// TODO: Add seeds
+		App.DATABASE.updateProductVersion(id_p, vid, version_name, version_alterations, version_publish_date,
+				version_added_date, version_identifier, operating_systems, additional_requirements, download_size,
+				download_name, download_link, downloads_total, downloads_last_week, license_model,
+				license_limitations, license_cost);
 	}
 
 	// User reviews
@@ -200,7 +230,7 @@ public class DownloadComCrawler extends WebCrawler {
 	private static final Pattern THUMBS_UP = Pattern.compile("rating=1&[\\s\\S]*?\\((\\d+)\\)");
 	private static final Pattern THUMBS_DOWN = Pattern.compile("rating=0&[\\s\\S]*?\\((\\d+)\\)");
 
-	public void handleUserReviews(String pageContent) {
+	protected void handleUserReviews(String pageContent) {
 
 		Matcher m = MESSAGE_CONTAINER.matcher(pageContent);
 		while(m.find()) {
@@ -213,8 +243,9 @@ public class DownloadComCrawler extends WebCrawler {
 			double rating = Double.parseDouble(RegEx.getMatch(RATING, message));
 			String title = RegEx.getMatch(TITLE, message);
 			String author = RegEx.getMatch(AUTHOR, message);
+			Date date = null;
 			try {
-				Date date = DateParser.getDate(RegEx.getMatch(DATE, message));
+				date = DateParser.getDate(RegEx.getMatch(DATE, message));
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
@@ -224,10 +255,9 @@ public class DownloadComCrawler extends WebCrawler {
 			int thumbs_up = Integer.parseInt(RegEx.getMatch(THUMBS_UP, message));
 			int thumbs_down = Integer.parseInt(RegEx.getMatch(THUMBS_DOWN, message));
 
-			// TODO: Add to database
+			App.DATABASE.updateProductUserReview(mid, id_p, id_v, rating, title, author, date, pros, cons, summary,
+					thumbs_up, thumbs_down);
 		}
-
-		// TODO: Add seeds
 	}
 
 }

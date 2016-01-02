@@ -6,6 +6,7 @@ import edu.uci.ics.crawler4j.fetcher.PageFetcher;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 import edu.upb.winfo.utils.DatabaseConnection;
+import jd.http.RandomUserAgent;
 
 /**
  * Created by geskill on 30.12.2015.
@@ -13,22 +14,22 @@ import edu.upb.winfo.utils.DatabaseConnection;
  * crawler4j has some issues, that hinder the crawler to be more efficient
  * https://github.com/yasserg/crawler4j/issues/16
  *
- * https://github.com/yasserg/crawler4j/issues/108
- *
  * @author geskill
  */
 public class App {
+
+	// TODO: future versions implement a remote database to use the crawler from different tiers
+	public static final DatabaseInterface DATABASE = new LocalDatabase("data/config/database.xml");
+
 	public static void main(String[] args) throws Exception {
 
-		// TODO: future versions implement a remote database to use the crawler from different tiers
-		DatabaseInterface databaseInterface = new LocalDatabase("data/config/databaseConnection.xml");
-
 		String crawlStorageFolder = "data/crawl/root/";
-		int numberOfCrawlers = 7;
+		int numberOfCrawlers = 1; // TODO: rework on https://github.com/yasserg/crawler4j/issues/108
 
 		CrawlConfig crawlConfig = new CrawlConfig();
 		crawlConfig.setCrawlStorageFolder(crawlStorageFolder);
 		crawlConfig.setResumableCrawling(true);
+		crawlConfig.setUserAgentString(RandomUserAgent.generate());
 
         /*
          * Instantiate the controller for this crawl.
