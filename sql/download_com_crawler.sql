@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `download_com_product_versions` (
   `version_added_date` date NOT NULL,
   `version_identifier` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `operating_systems` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `additional_requirements` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `additional_requirements` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
   `download_size` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `download_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `download_link` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
