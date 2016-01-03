@@ -82,9 +82,9 @@ public class ProductUserReviewTable {
 				stmt.setString(index++, title);
 				stmt.setString(index++, author);
 				if (date == null) {
-					stmt.setDate(index++, date);
-				} else {
 					stmt.setNull(index++, Types.DATE);
+				} else {
+					stmt.setDate(index++, date);
 				}
 				stmt.setString(index++, pros);
 				stmt.setString(index++, cons);
