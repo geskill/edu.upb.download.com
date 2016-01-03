@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `download_com_product_versions` (
   `modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'internal usage',
   `id_p` int(9) NOT NULL COMMENT 'related product id',
   `vid` int(9) NOT NULL COMMENT 'version id of the product',
-  `version_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `version_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `version_alterations` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `version_publish_date` date NOT NULL,
   `version_added_date` date NOT NULL,
