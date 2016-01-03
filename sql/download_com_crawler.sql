@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS `download_com_product_versions` (
   `downloads_total` int(10) NOT NULL,
   `downloads_last_week` int(10) NOT NULL,
   `license_model` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `license_limitations` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `license_limitations` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
   `license_cost` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
