@@ -53,8 +53,9 @@ public class DownloadComCrawler extends WebCrawler {
 	public boolean shouldVisit(Page referringPage, WebURL url) {
 		String href = url.getURL().toLowerCase();
 		return !FILTERS.matcher(href).matches() && href.startsWith("http://download.cnet.com/")
-				&& !href.startsWith("http://download.cnet.com/blog/")
-				&& !href.startsWith("http://download.cnet.com/security-center/");
+				&& !href.startsWith("http://download.cnet.com/s/") // don't search in the search
+				&& !href.startsWith("http://download.cnet.com/blog/") // don't search in the blog
+				&& !href.startsWith("http://download.cnet.com/security-center/"); // don't search in the special security center area
 
 		// TODO: Remote database should check if the entry exists (if possible [exception i.e. /ccleaner/])
 	}
