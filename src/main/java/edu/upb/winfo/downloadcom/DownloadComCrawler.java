@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+import com.google.gson.Gson;
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
@@ -43,6 +44,10 @@ public class DownloadComCrawler extends WebCrawler {
 	 *
 	 *
 	 * /3000-2239_4-14488453.html?messageID=10998418
+	 *
+	 * User review pages
+	 * http://download.cnet.com/module/userReviews/10019223-14488453-10-false-createdDate-true-2-2239
+	 * http://download.cnet.com/module/userReviews/10019223-14488453-10-false-createdDate-true-3-2239
 	 */
 	@Override
 	public boolean shouldVisit(Page referringPage, WebURL url) {
@@ -71,9 +76,13 @@ public class DownloadComCrawler extends WebCrawler {
 				this.handleProduct(html);
 				this.handleProductVersion(html);
 				this.handleUserReviews(html);
+				this.handleFurtherUserReviews(html);
+			} else {
+				if (this.hasUserReviewsOnly(html)) {
+					// TODO: single user review page has no product set id
+					this.handleUserReviews(html);
+				}
 			}
-
-			// TODO: handle ajax user reviews from others than first page
 		}
 	}
 
@@ -81,6 +90,10 @@ public class DownloadComCrawler extends WebCrawler {
 
 	protected boolean hasProduct(String pageContent) {
 		return pageContent.contains(IS_PRODUCT_PAGE);
+	}
+
+	protected boolean hasUserReviewsOnly(String pageContent) {
+		return pageContent.trim().startsWith("<div class=\"paginationStrip header\">");
 	}
 
 	// Product
@@ -275,7 +288,11 @@ public class DownloadComCrawler extends WebCrawler {
 			String message = "messageId" + m.group(1);
 
 			int mid = Integer.parseInt(RegEx.getMatch(MID, message));
-			int id_p = Integer.parseInt(RegEx.getMatch(ID_P, pageContent));
+			String string_id_p = RegEx.getMatch(ID_P, pageContent);
+			int id_p = -1;
+			if (!string_id_p.isEmpty()) {
+				id_p = Integer.parseInt(string_id_p);
+			}
 			int id_v = Integer.parseInt(RegEx.getMatch(ID_V, message));
 			double rating = Double.parseDouble(RegEx.getMatch(RATING, message));
 			String title = RegEx.getMatch(TITLE, message);
@@ -297,4 +314,43 @@ public class DownloadComCrawler extends WebCrawler {
 		}
 	}
 
+	private static final Pattern USER_REVIEW_LINK_CONTAINER = Pattern.compile("data-review-infinite-scroll-options='(.*?)'");
+	private static final Pattern USER_REVIEW_LINK_MAX_PAGE = Pattern.compile("data-review-infinite-scroll-options[\\s\\S]*?<li>[\\s\\S]+data-pageNum=\"(\\d+)\"[\\s\\S]*?\"next\"");
+
+	protected void handleFurtherUserReviews(String pageContent) {
+
+		String user_review_link_container = RegEx.getMatch(USER_REVIEW_LINK_CONTAINER, pageContent);
+		Gson gson = new Gson();
+		UserReviewURL userReviewURL = gson.fromJson(user_review_link_container, UserReviewURL.class);
+
+		String string_user_review_link_max_page = RegEx.getMatch(USER_REVIEW_LINK_MAX_PAGE, pageContent);
+		int user_review_link_max_page = 0;
+		if (!string_user_review_link_max_page.isEmpty()) {
+			user_review_link_max_page = Integer.parseInt(string_user_review_link_max_page);
+		}
+
+		if (user_review_link_max_page > 1) {
+
+			// http://download.cnet.com/module/userReviews/10019223-14488453-10-false-createdDate-true-2-2239
+			// user_review_link_max_page 5: 2,3,4,5
+
+			for (int i = 1; i < user_review_link_max_page; i++) {
+
+				StringBuilder stringBuilder = new StringBuilder();
+				stringBuilder.append("http://download.cnet.com");
+				stringBuilder.append(userReviewURL.xhrBaseRequestUrl);
+				stringBuilder.append(i + 1);
+				stringBuilder.append("-");
+				stringBuilder.append(userReviewURL.nodeId);
+
+				// http://download.cnet.com/module/userReviews/xhr/10712203-11021691-10-false-createdDate-true-2-2648
+				// http://download.cnet.com/module/userReviews/10712203-11021691-10-false-createdDate-true-2-2648
+
+				String newSeed = stringBuilder.toString().replace("/xhr/", "/");
+
+				System.out.println("ADD COMMENTS SEED: " + newSeed);
+				this.getMyController().addSeed(newSeed);
+			}
+		}
+	}
 }
