@@ -118,15 +118,30 @@ public class DownloadComCrawler extends WebCrawler {
 		String editors_review_name = RegEx.getMatch(EDITORS_REVIEW_NAME, pageContent);
 		Date editors_review_date = null;
 		try {
-			editors_review_date = DateParser.getDate(RegEx.getMatch(EDITORS_REVIEW_DATE, pageContent));
+			String string_editors_review_date = RegEx.getMatch(EDITORS_REVIEW_DATE, pageContent);
+			if (!string_editors_review_date.isEmpty()) {
+				editors_review_date = DateParser.getDate(string_editors_review_date);
+			}
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 		String editors_review_description = RegEx.getMatch(EDITORS_REVIEW_DESCRIPTION, pageContent);
 		String editors_review_text = RegEx.getMatch(EDITORS_REVIEW_TEXT, pageContent);
-		double editors_review_rating = Double.parseDouble(RegEx.getMatch(EDITORS_REVIEW_RATING, pageContent));
-		double users_review_rating = Double.parseDouble(RegEx.getMatch(USERS_REVIEW_RATING, pageContent));
-		int users_review_rating_count = Integer.parseInt(RegEx.getMatch(USERS_REVIEW_RATING_COUNT, pageContent));
+		String string_editors_review_rating = RegEx.getMatch(EDITORS_REVIEW_RATING, pageContent);
+		double editors_review_rating = 0;
+		if (!string_editors_review_rating.isEmpty()) {
+			editors_review_rating = Double.parseDouble(string_editors_review_rating);
+		}
+		String string_users_review_rating = RegEx.getMatch(USERS_REVIEW_RATING, pageContent);
+		double users_review_rating = 0;
+		if (!string_users_review_rating.isEmpty()) {
+			users_review_rating = Double.parseDouble(string_users_review_rating);
+		}
+		String string_users_review_rating_count = RegEx.getMatch(USERS_REVIEW_RATING_COUNT, pageContent);
+		int users_review_rating_count = 0;
+		if (!string_users_review_rating_count.isEmpty()) {
+			users_review_rating_count = Integer.parseInt(string_users_review_rating_count);
+		}
 		String publisher_description = RegEx.getMatch(PUBLISHER_DESCRIPTION, pageContent);
 		String publisher_description_alterations = RegEx.getMatch(PUBLISHER_DESCRIPTION_ALTERATIONS, pageContent);
 		String publisher_name = RegEx.getMatch(PUBLISHER_NAME, pageContent);
@@ -138,6 +153,9 @@ public class DownloadComCrawler extends WebCrawler {
 		int latest_id_v = -1;
 		String oid_string = RegEx.getMatch(OIDString, pageContent);
 		if (oid_string.contains(Integer.toString(pid))) {
+
+			// problem if intentional wrong url is given: i.e. download.cnet.com/Avast-Free-Antivirus-2016/14488453
+			// => data-oid="3000-2239_4-14488453" ... however only theoretically problematic
 
 			// Newest version:
 			// download.cnet.com/Avast-Free-Antivirus-2016/3000-2239_4-10019223.html
