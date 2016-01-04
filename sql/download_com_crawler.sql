@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `download_com_product_user_reviews` (
   `id_p` int(9) NOT NULL COMMENT 'related product id',
   `id_v` int(9) NOT NULL COMMENT 'related version id of product',
   `rating` double NOT NULL,
-  `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
   `author` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `date` date NOT NULL,
   `pros` text COLLATE utf8mb4_unicode_ci NOT NULL,
