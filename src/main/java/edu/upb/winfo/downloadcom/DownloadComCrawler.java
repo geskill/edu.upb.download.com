@@ -78,11 +78,11 @@ public class DownloadComCrawler extends WebCrawler {
 			if (this.hasProduct(html)) {
 				this.handleProduct(html);
 				this.handleProductVersion(html);
-				this.handleUserReviews(html);
+				this.handleUserReviews(html, url);
 				this.handleFurtherUserReviews(html);
 			} else {
 				if (this.hasUserReviewsOnly(html)) {
-					this.handleUserReviews(html);
+					this.handleUserReviews(html, url);
 				}
 			}
 		}
@@ -282,7 +282,9 @@ public class DownloadComCrawler extends WebCrawler {
 	private static final Pattern THUMBS_UP = Pattern.compile("rating=1&[\\s\\S]*?\\((\\d+)\\)");
 	private static final Pattern THUMBS_DOWN = Pattern.compile("rating=0&[\\s\\S]*?\\((\\d+)\\)");
 
-	protected void handleUserReviews(String pageContent) {
+	private static final Pattern ID_P_FROM_URL = Pattern.compile("userReviews\\/(\\d+)-");
+
+	protected void handleUserReviews(String pageContent, String url) {
 
 		Matcher m = MESSAGE_CONTAINER.matcher(pageContent);
 		while(m.find()) {
@@ -299,6 +301,12 @@ public class DownloadComCrawler extends WebCrawler {
 			if (id_p == -1) {
 				// single user review page has no product set id
 				id_p = App.DATABASE.getProductIDFromVersionID(id_v);
+			}
+			if ((id_p == 0) && (url.contains("/userReviews/"))) {
+				string_id_p = RegEx.getMatch(ID_P_FROM_URL, url);
+				if (!string_id_p.isEmpty()) {
+					id_p = Integer.parseInt(string_id_p);
+				}
 			}
 			double rating = Double.parseDouble(RegEx.getMatch(RATING, message));
 			String title = RegEx.getMatch(TITLE, message);
@@ -325,38 +333,41 @@ public class DownloadComCrawler extends WebCrawler {
 
 	protected void handleFurtherUserReviews(String pageContent) {
 
-		String user_review_link_container = RegEx.getMatch(USER_REVIEW_LINK_CONTAINER, pageContent);
-		Gson gson = new Gson();
-		UserReviewURL userReviewURL = gson.fromJson(user_review_link_container, UserReviewURL.class);
+		if (!pageContent.contains("selected >All versions</option>")) {
 
-		String string_user_review_link_max_page = RegEx.getMatch(USER_REVIEW_LINK_MAX_PAGE, pageContent);
-		int user_review_link_max_page = 0;
-		if (!string_user_review_link_max_page.isEmpty()) {
-			user_review_link_max_page = Integer.parseInt(string_user_review_link_max_page);
-		}
+			String user_review_link_container = RegEx.getMatch(USER_REVIEW_LINK_CONTAINER, pageContent);
+			Gson gson = new Gson();
+			UserReviewURL userReviewURL = gson.fromJson(user_review_link_container, UserReviewURL.class);
 
-		if (user_review_link_max_page > 1) {
+			String string_user_review_link_max_page = RegEx.getMatch(USER_REVIEW_LINK_MAX_PAGE, pageContent);
+			int user_review_link_max_page = 0;
+			if (!string_user_review_link_max_page.isEmpty()) {
+				user_review_link_max_page = Integer.parseInt(string_user_review_link_max_page);
+			}
 
-			// http://download.cnet.com/module/userReviews/10019223-14488453-10-false-createdDate-true-2-2239
-			// user_review_link_max_page 5: 2,3,4,5
+			if (user_review_link_max_page > 1) {
 
-			for (int i = 1; i < user_review_link_max_page; i++) {
+				// http://download.cnet.com/module/userReviews/10019223-14488453-10-false-createdDate-true-2-2239
+				// user_review_link_max_page 5: 2,3,4,5
 
-				StringBuilder stringBuilder = new StringBuilder();
-				stringBuilder.append("http://download.cnet.com");
-				stringBuilder.append(userReviewURL.xhrBaseRequestUrl.replace("false", "true"));
-				stringBuilder.append(i + 1);
-				stringBuilder.append("-");
-				stringBuilder.append(userReviewURL.nodeId);
+				for (int i = 1; i < user_review_link_max_page; i++) {
 
-				// http://download.cnet.com/module/userReviews/xhr/10712203-11021691-10-false-createdDate-true-2-2648
-				// http://download.cnet.com/module/userReviews/10712203-11021691-10-false-createdDate-true-2-2648
+					StringBuilder stringBuilder = new StringBuilder();
+					stringBuilder.append("http://download.cnet.com");
+					stringBuilder.append(userReviewURL.xhrBaseRequestUrl);
+					stringBuilder.append(i + 1);
+					stringBuilder.append("-");
+					stringBuilder.append(userReviewURL.nodeId);
 
-				String newSeed = stringBuilder.toString().replace("/xhr/", "/");
+					// http://download.cnet.com/module/userReviews/xhr/10712203-11021691-10-false-createdDate-true-2-2648
+					// http://download.cnet.com/module/userReviews/10712203-11021691-10-false-createdDate-true-2-2648
 
-				logger.info("ADD COMMENTS SEED: " + newSeed);
-				// System.out.println("ADD COMMENTS SEED: " + newSeed);
-				this.getMyController().addSeed(newSeed);
+					String newSeed = stringBuilder.toString().replace("/xhr/", "/");
+
+					logger.info("ADD COMMENTS SEED: " + newSeed);
+					// System.out.println("ADD COMMENTS SEED: " + newSeed);
+					this.getMyController().addSeed(newSeed);
+				}
 			}
 		}
 	}

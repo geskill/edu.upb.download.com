@@ -22,10 +22,9 @@ public class ProductUserReviewTable extends DatabaseTable {
 		ResultSet rset = null;
 		try {
 			stmt = con.prepareStatement("SELECT count(*) FROM `download_com_product_user_reviews` " +
-					"WHERE `mid`=? AND `id_p`=? AND `id_v`=?");
+					"WHERE `mid`=? AND `id_v`=?");
 			stmt.setInt(1, mid);
-			stmt.setInt(2, id_p);
-			stmt.setInt(3, id_v);
+			stmt.setInt(2, id_v);
 			rset = stmt.executeQuery();
 			if (rset.next()) {
 				count = rset.getInt(1);
@@ -51,8 +50,7 @@ public class ProductUserReviewTable extends DatabaseTable {
 			if (!hasProductUserReview(mid, id_p, id_v)) {
 				query = "INSERT INTO `download_com_product_user_reviews`(`mid`, `id_p`, `id_v`, `rating`, `title`, " +
 						"`author`, `date`, `pros`, `cons`, `summary`, `thumbs_up`, `thumbs_down`) VALUES (?,?,?,?,?," +
-						"?," +
-						"?,?,?,?,?,?)";
+						"?,?,?,?,?,?,?)";
 				stmt = con.prepareStatement(query);
 				stmt.setInt(index++, mid);
 				stmt.setInt(index++, id_p);
@@ -72,10 +70,10 @@ public class ProductUserReviewTable extends DatabaseTable {
 				stmt.setInt(index++, thumbs_down);
 
 			} else {
-				query = "UPDATE `download_com_product_user_reviews` SET `rating`=?,`title`=?,`author`=?,`date`=?," +
-						"`pros`=?,`cons`=?,`summary`=?,`thumbs_up`=?,`thumbs_down`=? WHERE `mid`=? AND `id_p`=? AND " +
-						"`id_v`=?";
+				query = "UPDATE `download_com_product_user_reviews` SET `id_p`=?,`rating`=?,`title`=?,`author`=?,`date`=?," +
+						"`pros`=?,`cons`=?,`summary`=?,`thumbs_up`=?,`thumbs_down`=? WHERE `mid`=? AND `id_v`=?";
 				stmt = con.prepareStatement(query);
+				stmt.setInt(index++, id_p);
 				stmt.setDouble(index++, rating);
 				stmt.setString(index++, title);
 				stmt.setString(index++, author);
@@ -90,7 +88,6 @@ public class ProductUserReviewTable extends DatabaseTable {
 				stmt.setInt(index++, thumbs_up);
 				stmt.setInt(index++, thumbs_down);
 				stmt.setInt(index++, mid);
-				stmt.setInt(index++, id_p);
 				stmt.setInt(index++, id_v);
 
 			}
