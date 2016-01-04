@@ -53,6 +53,7 @@ public class DownloadComCrawler extends WebCrawler {
 	public boolean shouldVisit(Page referringPage, WebURL url) {
 		String href = url.getURL().toLowerCase();
 		return !FILTERS.matcher(href).matches() && href.startsWith("http://download.cnet.com/")
+				&& !href.contains("?")
 				&& !href.startsWith("http://download.cnet.com/s/") // don't search in the search
 				&& !href.startsWith("http://download.cnet.com/blog/") // don't search in the blog
 				&& !href.startsWith("http://download.cnet.com/security-center/"); // don't search in the special security center area
@@ -343,7 +344,7 @@ public class DownloadComCrawler extends WebCrawler {
 
 				StringBuilder stringBuilder = new StringBuilder();
 				stringBuilder.append("http://download.cnet.com");
-				stringBuilder.append(userReviewURL.xhrBaseRequestUrl);
+				stringBuilder.append(userReviewURL.xhrBaseRequestUrl.replace("false", "true"));
 				stringBuilder.append(i + 1);
 				stringBuilder.append("-");
 				stringBuilder.append(userReviewURL.nodeId);

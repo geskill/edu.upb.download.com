@@ -9,6 +9,9 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 import jd.http.RandomUserAgent;
 import org.apache.log4j.*;
+import org.apache.log4j.spi.Filter;
+import org.apache.log4j.varia.LevelMatchFilter;
+import org.apache.log4j.varia.LevelRangeFilter;
 
 /**
  * Created by geskill on 30.12.2015.
@@ -27,16 +30,23 @@ public class App {
 
 		Logger logger = Logger.getRootLogger();
 
+		LevelRangeFilter filter = new LevelRangeFilter();
+		filter.setAcceptOnMatch(true);
+		filter.setLevelMin(Level.INFO);
+		filter.setLevelMax(Level.FATAL);
+
 		ConsoleAppender consoleAppender = new ConsoleAppender();
 		consoleAppender.setName("ConsoleAppender");
 		consoleAppender.setWriter(new OutputStreamWriter(System.out));
 		consoleAppender.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
+		consoleAppender.addFilter(filter);
 		logger.addAppender(consoleAppender);
 
 		FileAppender fileAppender = new FileAppender();
 		fileAppender.setName("FileAppender");
 		fileAppender.setFile("data/log/log.txt", true, false, 8*1024); // setFile(fileName) has bug
 		fileAppender.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
+		fileAppender.addFilter(filter);
 		logger.addAppender(fileAppender);
 
 		String crawlStorageFolder = "data/crawl/root/";
@@ -53,6 +63,7 @@ public class App {
          */
 		PageFetcher pageFetcher = new PageFetcher(crawlConfig);
 		RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
+		robotstxtConfig.setEnabled(false);
 		RobotstxtServer robotstxtServer = new RobotstxtServer(robotstxtConfig, pageFetcher);
 		CrawlController controller = new CrawlController(crawlConfig, pageFetcher, robotstxtServer);
 
