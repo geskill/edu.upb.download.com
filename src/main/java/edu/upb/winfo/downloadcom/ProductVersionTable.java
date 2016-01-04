@@ -1,6 +1,7 @@
 package edu.upb.winfo.downloadcom;
 
 import edu.upb.winfo.utils.DatabaseConnection;
+import edu.upb.winfo.utils.DatabaseTable;
 
 import java.sql.*;
 
@@ -9,13 +10,10 @@ import java.sql.*;
  *
  * @author geskill
  */
-public class ProductVersionTable {
-
-	private Connection con;
+public class ProductVersionTable extends DatabaseTable {
 
 	public ProductVersionTable(Connection connArg) {
-		super();
-		this.con = connArg;
+		super(connArg);
 	}
 
 	public boolean hasProductVersion(int id_p, int vid) throws SQLException {
@@ -40,6 +38,28 @@ public class ProductVersionTable {
 			}
 		}
 		return count > 0;
+	}
+
+	public int getProductIDFromVersionID(int vid) throws SQLException {
+		int result = 0;
+		PreparedStatement stmt = null;
+		ResultSet rset = null;
+		try {
+			stmt = con.prepareStatement("SELECT `id_p` FROM `download_com_product_versions` WHERE `vid`=?");
+			stmt.setInt(1, vid);
+			rset = stmt.executeQuery();
+			if (rset.next()) {
+				result = rset.getInt(1);
+			}
+
+		} catch (SQLException e) {
+			DatabaseConnection.printSQLException(e);
+		} finally {
+			if (stmt != null) {
+				stmt.close();
+			}
+		}
+		return result;
 	}
 
 	public void updateProductVersion(int id_p, int vid, String version_name, String version_alterations,
@@ -120,7 +140,8 @@ public class ProductVersionTable {
 				stmt.setInt(index++, vid);
 
 			}
-			System.out.println("query: " + stmt);
+			logger.info("query: " + stmt);
+			// System.out.println("query: " + stmt);
 			stmt.executeUpdate();
 
 		} catch (SQLException e) {

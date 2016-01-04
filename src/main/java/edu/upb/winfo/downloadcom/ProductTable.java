@@ -1,6 +1,7 @@
 package edu.upb.winfo.downloadcom;
 
 import edu.upb.winfo.utils.DatabaseConnection;
+import edu.upb.winfo.utils.DatabaseTable;
 
 import java.sql.*;
 
@@ -9,13 +10,10 @@ import java.sql.*;
  *
  * @author geskill
  */
-public class ProductTable {
-
-	private Connection con;
+public class ProductTable extends DatabaseTable {
 
 	public ProductTable(Connection connArg) {
-		super();
-		this.con = connArg;
+		super(connArg);
 	}
 
 	public boolean hasProduct(int pid) throws SQLException {
@@ -111,7 +109,8 @@ public class ProductTable {
 				stmt.setInt(index++, pid);
 
 			}
-			System.out.println("query: " + stmt);
+			logger.info("query: " + stmt);
+			// System.out.println("query: " + stmt);
 			stmt.executeUpdate();
 
 		} catch (SQLException e) {

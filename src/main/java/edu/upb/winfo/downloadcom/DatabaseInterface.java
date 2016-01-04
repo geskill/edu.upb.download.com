@@ -53,6 +53,13 @@ public interface DatabaseInterface {
 
 	/**
 	 *
+	 * @param vid
+	 * @return
+	 */
+	int getProductIDFromVersionID(int vid);
+
+	/**
+	 *
 	 * @param id_p
 	 * @param vid
 	 * @param version_name

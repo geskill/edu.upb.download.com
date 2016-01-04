@@ -1,6 +1,7 @@
 package edu.upb.winfo.downloadcom;
 
 import edu.upb.winfo.utils.DatabaseConnection;
+import edu.upb.winfo.utils.DatabaseTable;
 
 import java.sql.*;
 
@@ -9,13 +10,10 @@ import java.sql.*;
  *
  * @author geskill
  */
-public class ProductUserReviewTable {
-
-	private Connection con;
+public class ProductUserReviewTable extends DatabaseTable {
 
 	public ProductUserReviewTable(Connection connArg) {
-		super();
-		this.con = connArg;
+		super(connArg);
 	}
 
 	public boolean hasProductUserReview(int mid, int id_p, int id_v) throws SQLException {
@@ -96,7 +94,8 @@ public class ProductUserReviewTable {
 				stmt.setInt(index++, id_v);
 
 			}
-			System.out.println("query: " + stmt);
+			logger.info("query: " + stmt);
+			// System.out.println("query: " + stmt);
 			stmt.executeUpdate();
 
 		} catch (SQLException e) {

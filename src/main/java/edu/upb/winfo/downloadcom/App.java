@@ -1,12 +1,14 @@
 package edu.upb.winfo.downloadcom;
 
+import java.io.OutputStreamWriter;
+
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
-import edu.upb.winfo.utils.DatabaseConnection;
 import jd.http.RandomUserAgent;
+import org.apache.log4j.*;
 
 /**
  * Created by geskill on 30.12.2015.
@@ -22,6 +24,20 @@ public class App {
 	public static final DatabaseInterface DATABASE = new LocalDatabase("data/config/database.xml");
 
 	public static void main(String[] args) throws Exception {
+
+		Logger logger = Logger.getRootLogger();
+
+		ConsoleAppender consoleAppender = new ConsoleAppender();
+		consoleAppender.setName("ConsoleAppender");
+		consoleAppender.setWriter(new OutputStreamWriter(System.out));
+		consoleAppender.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
+		logger.addAppender(consoleAppender);
+
+		FileAppender fileAppender = new FileAppender();
+		fileAppender.setName("FileAppender");
+		fileAppender.setFile("data/log/log.txt", true, false, 8*1024); // setFile(fileName) has bug
+		fileAppender.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
+		logger.addAppender(fileAppender);
 
 		String crawlStorageFolder = "data/crawl/root/";
 		int numberOfCrawlers = 1; // TODO: rework on https://github.com/yasserg/crawler4j/issues/108

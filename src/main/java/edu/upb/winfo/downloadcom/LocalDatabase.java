@@ -133,6 +133,20 @@ public class LocalDatabase implements DatabaseInterface {
 	}
 
 	/**
+	 *
+	 * @param vid
+	 * @return
+	 */
+	public int getProductIDFromVersionID(int vid) {
+		try {
+			return this.productVersionTable.getProductIDFromVersionID(vid);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	/**
 	 * @param id_p
 	 * @param vid
 	 * @param version_name

@@ -67,7 +67,8 @@ public class DownloadComCrawler extends WebCrawler {
 	@Override
 	public void visit(Page page) {
 		String url = page.getWebURL().getURL();
-		System.out.println("URL: " + url);
+		logger.info("URL: " + url);
+		// System.out.println("URL: " + url);
 
 		if (page.getParseData() instanceof HtmlParseData) {
 			HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
@@ -80,7 +81,6 @@ public class DownloadComCrawler extends WebCrawler {
 				this.handleFurtherUserReviews(html);
 			} else {
 				if (this.hasUserReviewsOnly(html)) {
-					// TODO: single user review page has no product set id
 					this.handleUserReviews(html);
 				}
 			}
@@ -295,6 +295,10 @@ public class DownloadComCrawler extends WebCrawler {
 				id_p = Integer.parseInt(string_id_p);
 			}
 			int id_v = Integer.parseInt(RegEx.getMatch(ID_V, message));
+			if (id_p == -1) {
+				// single user review page has no product set id
+				id_p = App.DATABASE.getProductIDFromVersionID(id_v);
+			}
 			double rating = Double.parseDouble(RegEx.getMatch(RATING, message));
 			String title = RegEx.getMatch(TITLE, message);
 			String author = RegEx.getMatch(AUTHOR, message);
@@ -349,7 +353,8 @@ public class DownloadComCrawler extends WebCrawler {
 
 				String newSeed = stringBuilder.toString().replace("/xhr/", "/");
 
-				System.out.println("ADD COMMENTS SEED: " + newSeed);
+				logger.info("ADD COMMENTS SEED: " + newSeed);
+				// System.out.println("ADD COMMENTS SEED: " + newSeed);
 				this.getMyController().addSeed(newSeed);
 			}
 		}
