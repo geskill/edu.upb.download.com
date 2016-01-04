@@ -321,7 +321,7 @@ public class DownloadComCrawler extends WebCrawler {
 	}
 
 	private static final Pattern USER_REVIEW_LINK_CONTAINER = Pattern.compile("data-review-infinite-scroll-options='(.*?)'");
-	private static final Pattern USER_REVIEW_LINK_MAX_PAGE = Pattern.compile("data-review-infinite-scroll-options[\\s\\S]*?<li>[\\s\\S]+data-pageNum=\"(\\d+)\"[\\s\\S]*?\"next\"");
+	private static final Pattern USER_REVIEW_LINK_MAX_PAGE = Pattern.compile("data-review-infinite-scroll-options[\\s\\S]*?<li>[\\s\\S]+data-pageNum=\"(\\d+)\"[\\s\\S]*?<li class=\"next\"");
 
 	protected void handleFurtherUserReviews(String pageContent) {
 
