@@ -257,7 +257,7 @@ public class DownloadComCrawler extends WebCrawler {
 
 	private static final Pattern VID = Pattern.compile("softwareId:\"(\\d+)\"");
 	private static final Pattern VERSION_NAME = Pattern.compile("softwareName:\"(.*?)\"");
-	private static final Pattern VERSION_ALTERATIONS = Pattern.compile("full-specs[\\s\\S]*?tbody>([\\s\\S]*?)<\\/tbody>");
+	private static final Pattern VERSION_ALTERATIONS = Pattern.compile("full-specs[\\s\\S]*?tbody>([\\s\\S]*?)<\\/tbody>[\\s\\S]+specsPubName");
 
 	private static final Pattern VERSION_PUBLISH_DATE = Pattern.compile("specsPubReleaseDate[\\s\\S]*?Date[\\s\\S]*?>(.*?)<");
 	private static final Pattern VERSION_ADDED_DATE = Pattern.compile("specsPubDateAdded[\\s\\S]*?Added[\\s\\S]*?>(.*?)<");
