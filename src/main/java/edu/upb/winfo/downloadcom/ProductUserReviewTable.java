@@ -31,6 +31,7 @@ public class ProductUserReviewTable extends DatabaseTable {
 			}
 
 		} catch (SQLException e) {
+			logger.error("Error on hasProductUserReview(" + mid + ")");
 			DatabaseConnection.printSQLException(e);
 		} finally {
 			if (stmt != null) {
@@ -96,6 +97,7 @@ public class ProductUserReviewTable extends DatabaseTable {
 			stmt.executeUpdate();
 
 		} catch (SQLException e) {
+			logger.error("Error on hasProductUserReview(" + mid + ")");
 			DatabaseConnection.printSQLException(e);
 		} finally {
 			if (stmt != null) {

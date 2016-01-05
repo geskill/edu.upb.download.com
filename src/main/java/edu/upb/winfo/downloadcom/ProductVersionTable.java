@@ -31,6 +31,7 @@ public class ProductVersionTable extends DatabaseTable {
 			}
 
 		} catch (SQLException e) {
+			logger.error("Error on hasProductVersion(" + vid + ")");
 			DatabaseConnection.printSQLException(e);
 		} finally {
 			if (stmt != null) {
@@ -53,6 +54,7 @@ public class ProductVersionTable extends DatabaseTable {
 			}
 
 		} catch (SQLException e) {
+			logger.error("Error on getProductIDFromVersionID(" + vid + ")");
 			DatabaseConnection.printSQLException(e);
 		} finally {
 			if (stmt != null) {
@@ -145,6 +147,7 @@ public class ProductVersionTable extends DatabaseTable {
 			stmt.executeUpdate();
 
 		} catch (SQLException e) {
+			logger.error("Error on updateProductVersion(" + vid + ")");
 			DatabaseConnection.printSQLException(e);
 		} finally {
 			if (stmt != null) {

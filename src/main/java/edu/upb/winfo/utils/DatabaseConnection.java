@@ -1,5 +1,8 @@
 package edu.upb.winfo.utils;
 
+import uk.org.lidalia.slf4jext.Logger;
+import uk.org.lidalia.slf4jext.LoggerFactory;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -19,6 +22,8 @@ import java.io.*;
  * @author geskill
  */
 public class DatabaseConnection {
+
+	protected static final Logger logger = LoggerFactory.getLogger(DatabaseConnection.class);
 
 	public String dbms;
 	public String jarFile;
@@ -48,13 +53,11 @@ public class DatabaseConnection {
 
 	public static void printWarnings(SQLWarning warning) throws SQLException {
 		if (warning != null) {
-			System.out.println("\n---Warning---\n");
+			logger.warn("\n---Warning---\n");
 			while (warning != null) {
-				System.out.println("Message: " + warning.getMessage());
-				System.out.println("SQLState: " + warning.getSQLState());
-				System.out.print("Vendor error code: ");
-				System.out.println(warning.getErrorCode());
-				System.out.println("");
+				logger.warn("Message: " + warning.getMessage());
+				logger.warn("SQLState: " + warning.getSQLState());
+				logger.warn("Vendor error code: " + warning.getErrorCode());
 				warning = warning.getNextWarning();
 			}
 		}
@@ -75,13 +78,13 @@ public class DatabaseConnection {
 		this.serverName = this.prop.getProperty("server_name");
 		this.portNumber = Integer.parseInt(this.prop.getProperty("port_number"));
 
-		System.out.println("Set the following properties:");
-		System.out.println("dbms: " + dbms);
-		System.out.println("driver: " + driver);
-		System.out.println("dbName: " + dbName);
-		System.out.println("userName: " + userName);
-		System.out.println("serverName: " + serverName);
-		System.out.println("portNumber: " + portNumber);
+		logger.info("Set the following properties:");
+		logger.info("dbms: " + dbms);
+		logger.info("driver: " + driver);
+		logger.info("dbName: " + dbName);
+		logger.info("userName: " + userName);
+		logger.info("serverName: " + serverName);
+		logger.info("portNumber: " + portNumber);
 	}
 
 	/**
@@ -123,6 +126,11 @@ public class DatabaseConnection {
 		}
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws SQLException
+	 */
 	public Connection getConnection() throws SQLException {
 		this.doInit();
 		Connection conn = null;
@@ -137,10 +145,15 @@ public class DatabaseConnection {
 			conn = DriverManager.getConnection("jdbc:" + this.dbms + ":" + this.dbName + ";create=true",
 					connectionProps);
 		}
-		System.out.println("Connected to database");
+		logger.info("Connected to database");
 		return conn;
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws SQLException
+	 */
 	public Connection getConnectionToDatabase() throws SQLException {
 		this.doInit();
 		Connection conn = null;
@@ -155,12 +168,16 @@ public class DatabaseConnection {
 		} else if (this.dbms.equals("derby")) {
 			conn = DriverManager.getConnection("jdbc:" + dbms + ":" + dbName, connectionProps);
 		}
-		System.out.println("Connected to database");
+		logger.info("Connected to database");
 		return conn;
 	}
 
+	/**
+	 *
+	 * @param connArg
+	 */
 	public static void closeConnection(Connection connArg) {
-		System.out.println("Releasing all open resources ...");
+		logger.info("Releasing all open resources ...");
 		try {
 			if (connArg != null) {
 				connArg.close();
@@ -171,17 +188,21 @@ public class DatabaseConnection {
 		}
 	}
 
+	/**
+	 *
+	 * @param ex
+	 */
 	public static void printSQLException(SQLException ex) {
 		for (Throwable e : ex) {
 			if (e instanceof SQLException) {
 				if (ignoreSQLException(((SQLException) e).getSQLState()) == false) {
 					e.printStackTrace(System.err);
-					System.err.println("SQLState: " + ((SQLException) e).getSQLState());
-					System.err.println("Error Code: " + ((SQLException) e).getErrorCode());
-					System.err.println("Message: " + e.getMessage());
+					logger.error("SQLState: " + ((SQLException) e).getSQLState());
+					logger.error("Error Code: " + ((SQLException) e).getErrorCode());
+					logger.error("Message: " + e.getMessage());
 					Throwable t = ex.getCause();
 					while (t != null) {
-						System.out.println("Cause: " + t);
+						logger.error("Cause: " + t);
 						t = t.getCause();
 					}
 				}
@@ -189,9 +210,14 @@ public class DatabaseConnection {
 		}
 	}
 
+	/**
+	 *
+	 * @param sqlState
+	 * @return
+	 */
 	public static boolean ignoreSQLException(String sqlState) {
 		if (sqlState == null) {
-			System.out.println("The SQL state is not defined!");
+			logger.info("The SQL state is not defined!");
 			return false;
 		}
 		// X0Y32: Jar file already exists in schema

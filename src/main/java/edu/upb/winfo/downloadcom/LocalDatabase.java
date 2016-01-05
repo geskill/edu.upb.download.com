@@ -1,6 +1,8 @@
 package edu.upb.winfo.downloadcom;
 
 import edu.upb.winfo.utils.DatabaseConnection;
+import uk.org.lidalia.slf4jext.Logger;
+import uk.org.lidalia.slf4jext.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -14,13 +16,14 @@ import java.util.Date;
  */
 public class LocalDatabase implements DatabaseInterface {
 
+	protected static final Logger logger = LoggerFactory.getLogger(LocalDatabase.class);
+
 	private Connection connection = null;
 	private ProductTable productTable = null;
 	private ProductVersionTable productVersionTable = null;
 	private ProductUserReviewTable productUserReviewTable = null;
 
 	/**
-	 *
 	 * @param propertiesFileName
 	 */
 	public LocalDatabase(String propertiesFileName) {
@@ -28,13 +31,13 @@ public class LocalDatabase implements DatabaseInterface {
 		try {
 			databaseConnection = new DatabaseConnection(propertiesFileName);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Error reading database settings", e);
 		}
 		assert databaseConnection != null;
 		try {
 			this.connection = databaseConnection.getConnectionToDatabase();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			DatabaseConnection.printSQLException(e);
 		}
 
 		this.productTable = new ProductTable(this.connection);
@@ -50,12 +53,12 @@ public class LocalDatabase implements DatabaseInterface {
 		try {
 			this.connection.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			DatabaseConnection.printSQLException(e);
 		}
 		try {
 			super.finalize();
-		} catch (Throwable throwable) {
-			throwable.printStackTrace();
+		} catch (Throwable e) {
+			logger.error("Error on finalize", e);
 		}
 	}
 
@@ -69,7 +72,7 @@ public class LocalDatabase implements DatabaseInterface {
 		try {
 			return this.productTable.hasProduct(pid);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			DatabaseConnection.printSQLException(e);
 		}
 		return false;
 	}
@@ -112,7 +115,7 @@ public class LocalDatabase implements DatabaseInterface {
 					users_review_rating_count, publisher_description, publisher_description_alterations,
 					publisher_name, publisher_url, platform, category, subcategory, latest_id_v);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			DatabaseConnection.printSQLException(e);
 		}
 	}
 
@@ -127,13 +130,12 @@ public class LocalDatabase implements DatabaseInterface {
 		try {
 			return this.productVersionTable.hasProductVersion(id_p, vid);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			DatabaseConnection.printSQLException(e);
 		}
 		return false;
 	}
 
 	/**
-	 *
 	 * @param vid
 	 * @return
 	 */
@@ -141,7 +143,7 @@ public class LocalDatabase implements DatabaseInterface {
 		try {
 			return this.productVersionTable.getProductIDFromVersionID(vid);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			DatabaseConnection.printSQLException(e);
 		}
 		return 0;
 	}
@@ -167,9 +169,9 @@ public class LocalDatabase implements DatabaseInterface {
 	 */
 	public void updateProductVersion(int id_p, int vid, String version_name, String version_alterations, Date
 			version_publish_date, Date version_added_date, String version_identifier, String operating_systems, String
-			additional_requirements, String download_size, String download_name, String download_link, int
-			downloads_total, int downloads_last_week, String license_model, String license_limitations, String
-			license_cost) {
+			                                 additional_requirements, String download_size, String download_name, String download_link, int
+			                                 downloads_total, int downloads_last_week, String license_model, String license_limitations, String
+			                                 license_cost) {
 
 		java.sql.Date sql_version_publish_date = null;
 		java.sql.Date sql_version_added_date = null;
@@ -187,7 +189,7 @@ public class LocalDatabase implements DatabaseInterface {
 					additional_requirements, download_size, download_name, download_link, downloads_total,
 					downloads_last_week, license_model, license_limitations, license_cost);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			DatabaseConnection.printSQLException(e);
 		}
 	}
 
@@ -203,7 +205,7 @@ public class LocalDatabase implements DatabaseInterface {
 		try {
 			return this.productUserReviewTable.hasProductUserReview(mid, id_p, id_v);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			DatabaseConnection.printSQLException(e);
 		}
 		return false;
 	}
@@ -235,7 +237,7 @@ public class LocalDatabase implements DatabaseInterface {
 			this.productUserReviewTable.updateProductUserReview(mid, id_p, id_v, rating, title, author, sql_date,
 					pros, cons, summary, thumbs_up, thumbs_down);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			DatabaseConnection.printSQLException(e);
 		}
 	}
 }

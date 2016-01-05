@@ -29,6 +29,7 @@ public class ProductTable extends DatabaseTable {
 			}
 
 		} catch (SQLException e) {
+			logger.error("Error on hasProduct(" + pid + ")");
 			DatabaseConnection.printSQLException(e);
 		} finally {
 			if (stmt != null) {
@@ -114,6 +115,7 @@ public class ProductTable extends DatabaseTable {
 			stmt.executeUpdate();
 
 		} catch (SQLException e) {
+			logger.error("Error on updateProduct(" + pid + ")");
 			DatabaseConnection.printSQLException(e);
 		} finally {
 			if (stmt != null) {

@@ -23,8 +23,7 @@ import org.apache.log4j.varia.LevelRangeFilter;
  */
 public class App {
 
-	// TODO: future versions implement a remote database to use the crawler from different tiers
-	public static final DatabaseInterface DATABASE = new LocalDatabase("data/config/database.xml");
+	public static DatabaseInterface DATABASE = null;
 
 	public static void main(String[] args) throws Exception {
 
@@ -47,7 +46,7 @@ public class App {
 		ConsoleAppender consoleAppender = new ConsoleAppender();
 		consoleAppender.setName("ConsoleAppender");
 		consoleAppender.setWriter(new OutputStreamWriter(System.out));
-		consoleAppender.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
+		consoleAppender.setLayout(new PatternLayout("%d{ISO8601}|%-6r [%t] %-5p %30.30c %x - %m%n"));
 		consoleAppender.addFilter(filter);
 		logger.addAppender(consoleAppender);
 
@@ -57,9 +56,14 @@ public class App {
 		FileAppender fileAppender = new FileAppender();
 		fileAppender.setName("FileAppender");
 		fileAppender.setFile("data/log/log.txt", true, false, 8*1024); // setFile(fileName) has bug
-		fileAppender.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
+		fileAppender.setLayout(new PatternLayout("%d{ISO8601}|%-6r [%t] %-5p %30.30c %x - %m%n"));
 		fileAppender.addFilter(filter);
 		logger.addAppender(fileAppender);
+
+		/*
+         * Create now the database access.
+         */
+		DATABASE = new LocalDatabase("data/config/database.xml");
 
 		/*
          * Instantiate the crawler configuration
