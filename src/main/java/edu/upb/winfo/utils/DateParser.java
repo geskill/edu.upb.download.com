@@ -16,6 +16,13 @@ public class DateParser {
 	// INFO: Locale is US
 	private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMMMM dd, yyyy", Locale.US);
 
+	/**
+	 * Converts a download.cnet.com date format string into a java date format.
+	 *
+	 * @param date The download.cnet.com date format string
+	 * @return The date in java date format
+	 * @throws ParseException
+	 */
 	public static Date getDate(String date) throws ParseException {
 
 		return simpleDateFormat.parse(date);

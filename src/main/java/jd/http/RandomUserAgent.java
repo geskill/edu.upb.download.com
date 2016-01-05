@@ -2,6 +2,13 @@ package jd.http;
 
 /*
     copyright notice: Thomas Rechenmacher, AppWork GmbH - We Make Your App Work
+                      used inside jDownloader see: http://jdownloader.org/
+
+                      The source code can be downloaded at:
+                      http://dev.jdownloader.org/
+                      https://svn.jdownloader.org/projects
+                      svn://svn.jdownloader.org/jdownloader
+                      svn://svn.appwork.org/utils
  */
 
 import java.util.ArrayList;

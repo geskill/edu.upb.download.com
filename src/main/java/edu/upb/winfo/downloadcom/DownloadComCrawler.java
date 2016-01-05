@@ -32,20 +32,42 @@ public class DownloadComCrawler extends WebCrawler {
 	 * the given url should be crawled or not (based on your crawling logic).
 	 * In this example, we are instructing the crawler to ignore urls that
 	 * have css, js, git, ... extensions and to only accept urls that start
-	 * with "http://www.ics.uci.edu/". In this case, we didn't need the
+	 * with "http://download.cnet.com/". In this case, we didn't need the
 	 * referringPage parameter to make the decision.
 	 *
+	 * The URLs of download.cnet.com can have two types. First they have a
+	 * version name and some called "oid" (do not confuse this with ontology id).
+	 *
+	 *      |    |cat id|product set id (current version) or product version (older version)
+	 * oid = 3000-2239_4-10019223
+	 *
+	 * The 3000 seems to be static, maybe this is the platform id, to deliver
+	 * a different view for mobile devices. (don't know)
+	 *
+	 * The 2239_4 is the ontology id, better say the 2239. The _4 is again some
+	 * static thing.
+	 *
+	 * The 10019223 can be the product set id (if this is the current version) or
+	 * this is the product version id (if this is an older version).
 	 *
 	 * http://download.cnet.com/Avast-Free-Antivirus-2016/3000-2239_4-10019223.html
 	 * http://download.cnet.com/archive/3000-2239_4-14477201.html
 	 *
+	 * The second url version seems to be for special partners of download.cnet.com (guess).
+	 * This url is shorter and has no ids.
+	 *
 	 * http://download.cnet.com/ccleaner/
 	 * http://download.cnet.com/archive/3000-18512_4-14488690.html
 	 *
+	 * Furthermore for all not current version there is a special /archive/ url.
+
+	 * The user review urls have the following format:
 	 *
-	 * /3000-2239_4-14488453.html?messageID=10998418
+	 *                   static       descending true/false
+	 *  product   version  all versions?           page
+	 * | set id |    id  |  |     |    sort   |    | | nodeId
+	 * /10019223-14488453-10-false-createdDate-true-2-2239
 	 *
-	 * User review pages
 	 * http://download.cnet.com/module/userReviews/10019223-14488453-10-false-createdDate-true-2-2239
 	 * http://download.cnet.com/module/userReviews/10019223-14488453-10-false-createdDate-true-3-2239
 	 */
@@ -64,6 +86,9 @@ public class DownloadComCrawler extends WebCrawler {
 	/**
 	 * This function is called when a page is fetched and ready
 	 * to be processed by your program.
+	 *
+	 * We need to check if the visited page is a detailed product page
+	 * or a comments only page. Otherwise we do nothing.
 	 */
 	@Override
 	public void visit(Page page) {
@@ -76,12 +101,25 @@ public class DownloadComCrawler extends WebCrawler {
 			String html = htmlParseData.getHtml();
 
 			if (this.hasProduct(html)) {
+				// This page is the detailed product page
+
+				// Extract product information
 				this.handleProduct(html);
+
+				// Extract product version
 				this.handleProductVersion(html);
+
+				// Extract 10 comments present on the page
 				this.handleUserReviews(html, url);
+
+				// Check, whether there are more comments
+				// belonging to the current fetched version
 				this.handleFurtherUserReviews(html);
 			} else {
 				if (this.hasUserReviewsOnly(html)) {
+					// This page is the comments only page
+
+					// Extract 10 comments present on the page
 					this.handleUserReviews(html, url);
 				}
 			}
@@ -90,10 +128,25 @@ public class DownloadComCrawler extends WebCrawler {
 
 	private static final String IS_PRODUCT_PAGE = "\"ptype\": \"product_detail\"";
 
+	/**
+	 * Evaluates if the web page is the product page using a
+	 * unique string that is only present in a product page
+	 *
+	 * @param pageContent The HTML source code of the given page
+	 * @return true if the given web page is a product page
+	 */
 	protected boolean hasProduct(String pageContent) {
 		return pageContent.contains(IS_PRODUCT_PAGE);
 	}
 
+	/**
+	 * Evaluates if the web page is the comments only page
+	 * (with 10 comments, that is used by AJAX calls) using a
+	 * string that indicates the start of the page
+	 *
+	 * @param pageContent The HTML source code of the given page
+	 * @return true if the given web page is a comments only page
+	 */
 	protected boolean hasUserReviewsOnly(String pageContent) {
 		return pageContent.trim().startsWith("<div class=\"paginationStrip header\">");
 	}
@@ -126,6 +179,13 @@ public class DownloadComCrawler extends WebCrawler {
 	private static final Pattern CATEGORY = Pattern.compile("specsCategory[\\s\\S]*?Category[\\s\\S]*?\">(.*?)<");
 	private static final Pattern SUBCATEGORY = Pattern.compile("specsSubcategory[\\s\\S]*?Subcategory[\\s\\S]*?\">(.*?)<");
 
+	/**
+	 * Handles the detailed product page and extracts product only details
+	 * using the above specified regular expression patterns and saves the
+	 * extracted content into the product database
+	 *
+	 * @param pageContent The HTML source code of the given page
+	 */
 	protected void handleProduct(String pageContent) {
 
 		int pid = Integer.parseInt(RegEx.getMatch(PID, pageContent));
@@ -217,6 +277,13 @@ public class DownloadComCrawler extends WebCrawler {
 	private static final Pattern LICENSE_LIMITATIONS = Pattern.compile("specsLimitations[\\s\\S]*?Limitations[\\s\\S]*?<td>([\\s\\S]*?)<");
 	private static final Pattern LICENSE_COST = Pattern.compile("specsPrice[\\s\\S]*?Price[\\s\\S]*?<td>([\\s\\S]*?)<");
 
+	/**
+	 * Handles the detailed product page and extracts version only details
+	 * using the above specified regular expression patterns and saves the
+	 * extracted content into the product version database
+	 *
+	 * @param pageContent The HTML source code of the given page
+	 */
 	protected void handleProductVersion(String pageContent) {
 
 		int id_p = Integer.parseInt(RegEx.getMatch(PID, pageContent));
@@ -284,6 +351,23 @@ public class DownloadComCrawler extends WebCrawler {
 
 	private static final Pattern ID_P_FROM_URL = Pattern.compile("userReviews\\/(\\d+)-");
 
+	/**
+	 * Handles the the user reviews from either the detailed product or
+	 * the comments only page using the above specified regular expression
+	 * patterns and saves the extracted content into the user comments database.
+	 *
+	 * The URL parameter is used for the comments only page, because:
+	 * The detailed product page with the comments section has stored the
+	 * product set id, but however the comments only page not. Therefore,
+	 * the ID would be -1. Therefore, we try to retrieve the product set id
+	 * from the database, again there might be a problem if we fetch a comment
+	 * belonging to a version, which is not yet stored inside the database.
+	 * The database will give us 0 as result and we then extract the product
+	 * set id from the given url.
+	 *
+	 * @param pageContent The HTML source code of the given page
+	 * @param url The URL of the given page
+	 */
 	protected void handleUserReviews(String pageContent, String url) {
 
 		Matcher m = MESSAGE_CONTAINER.matcher(pageContent);
@@ -303,6 +387,7 @@ public class DownloadComCrawler extends WebCrawler {
 				id_p = App.DATABASE.getProductIDFromVersionID(id_v);
 			}
 			if ((id_p == 0) && (url.contains("/userReviews/"))) {
+				// extract product set id from URL
 				string_id_p = RegEx.getMatch(ID_P_FROM_URL, url);
 				if (!string_id_p.isEmpty()) {
 					id_p = Integer.parseInt(string_id_p);
@@ -328,9 +413,19 @@ public class DownloadComCrawler extends WebCrawler {
 		}
 	}
 
+	// Further user reviews
+
 	private static final Pattern USER_REVIEW_LINK_CONTAINER = Pattern.compile("data-review-infinite-scroll-options='(.*?)'");
 	private static final Pattern USER_REVIEW_LINK_MAX_PAGE = Pattern.compile("data-review-infinite-scroll-options[\\s\\S]*?<li>[\\s\\S]+data-pageNum=\"(\\d+)\"[\\s\\S]*?<li class=\"next\"");
 
+	/**
+	 * Determines if the given detail page offers more user reviews belonging to
+	 * the current version than are actually shown (only 10 comments per page are
+	 * shown to the user). In this case, this function generates seeds for the crawler
+	 * to fetch the user reviews belonging to the current version in the future
+	 *
+	 * @param pageContent The HTML source code of the given page
+	 */
 	protected void handleFurtherUserReviews(String pageContent) {
 
 		if (!pageContent.contains("selected >All versions</option>")) {

@@ -10,6 +10,15 @@ import java.util.regex.Pattern;
  */
 public class RegEx {
 
+	/**
+	 * This is just some function to simplify the regular expression usage.
+	 * We are always interested in the first group of the match. Additionally
+	 * we do some timing of line spaces.
+	 *
+	 * @param pattern The regular expression pattern
+	 * @param input The to be searched string
+	 * @return true, if found
+	 */
 	public static String getMatch(Pattern pattern, CharSequence input) {
 
 		Matcher m = pattern.matcher(input);

@@ -7,6 +7,13 @@ import java.util.logging.Logger;
 /**
  * Created by geskill on 02.01.2016.
  *
+ * This is some hack, to work around some Java issue for registering
+ * the JAR package with JDBC drivers at runtime.
+ *
+ * Can be found here:
+ * http://www.kfu.com/~nsayer/Java/dyn-jdbc.html
+ * https://code.google.com/p/starschema-bigquery-jdbc/source/browse/src/main/java/net/starschema/clouddb/initializer/DriverShim.java?r=af9c1199674e94dde7b8db8e9d4d8de3a86956d9
+ *
  * @author geskill
  */
 public class DriverShim implements Driver {

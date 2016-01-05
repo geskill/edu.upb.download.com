@@ -11,6 +11,7 @@ public interface DatabaseInterface {
 
 	/**
 	 * Checks if the product set is already in the database
+	 *
 	 * @param pid product set id
 	 * @return true if exists
 	 */

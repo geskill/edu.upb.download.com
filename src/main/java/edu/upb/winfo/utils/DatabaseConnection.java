@@ -13,6 +13,9 @@ import java.io.*;
 /**
  * Created by geskill on 02.01.2016.
  *
+ * This is copied from the JDBC tutorial:
+ * https://docs.oracle.com/javase/tutorial/jdbc/basics/
+ *
  * @author geskill
  */
 public class DatabaseConnection {
@@ -81,13 +84,20 @@ public class DatabaseConnection {
 		System.out.println("portNumber: " + portNumber);
 	}
 
+	/**
+	 * Using the class loader to dynamically load the JAR package with JDBC drivers at runtime.
+	 *
+	 * This is copied from:
+	 * http://codereview.stackexchange.com/questions/70669/loading-the-jdbc-driver-jar-dynamically-from-external-location
+	 *
+	 * @throws SQLException
+	 */
 	private void doInit() throws SQLException {
 
 		final URLClassLoader loader = (URLClassLoader) ClassLoader.getSystemClassLoader();
 
 		Method method = null;
 		try {
-			// some hacking
 			method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
 			method.setAccessible(true);
 			method.invoke(loader, new File(this.jarFile).toURI().toURL());

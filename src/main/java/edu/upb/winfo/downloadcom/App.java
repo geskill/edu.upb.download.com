@@ -28,13 +28,22 @@ public class App {
 
 	public static void main(String[] args) throws Exception {
 
+		/*
+         * Instantiate the application logging system.
+         */
 		Logger logger = Logger.getRootLogger();
 
+		/*
+         * Define log filter, to no log everything.
+         */
 		LevelRangeFilter filter = new LevelRangeFilter();
 		filter.setAcceptOnMatch(true);
 		filter.setLevelMin(Level.INFO);
 		filter.setLevelMax(Level.FATAL);
 
+		/*
+         * Write log to console.
+         */
 		ConsoleAppender consoleAppender = new ConsoleAppender();
 		consoleAppender.setName("ConsoleAppender");
 		consoleAppender.setWriter(new OutputStreamWriter(System.out));
@@ -42,6 +51,9 @@ public class App {
 		consoleAppender.addFilter(filter);
 		logger.addAppender(consoleAppender);
 
+		/*
+         * Write log to file.
+         */
 		FileAppender fileAppender = new FileAppender();
 		fileAppender.setName("FileAppender");
 		fileAppender.setFile("data/log/log.txt", true, false, 8*1024); // setFile(fileName) has bug
@@ -49,6 +61,9 @@ public class App {
 		fileAppender.addFilter(filter);
 		logger.addAppender(fileAppender);
 
+		/*
+         * Instantiate the crawler configuration
+         */
 		String crawlStorageFolder = "data/crawl/root/";
 		int numberOfCrawlers = 1; // TODO: rework on https://github.com/yasserg/crawler4j/issues/108
 
