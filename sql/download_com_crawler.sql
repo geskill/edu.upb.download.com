@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `download_com_products` (
   `publisher_description` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `publisher_description_alterations` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `publisher_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `publisher_url` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `publisher_url` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
   `platform` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `category` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subcategory` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
