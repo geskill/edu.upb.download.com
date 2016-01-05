@@ -346,7 +346,7 @@ public class DownloadComCrawler extends WebCrawler {
 
 	private static final Pattern RATING = Pattern.compile("<span>([\\d\\.]+) stars");
 	private static final Pattern TITLE = Pattern.compile("\"title\">(.*?)<\\/");
-	private static final Pattern AUTHOR = Pattern.compile("\"author\">[\\s\\S]*?\"> (.*?)<");
+	private static final Pattern AUTHOR = Pattern.compile("\"author\">[\\s\\S]*?\"> (.*?)<[\\s\\S]*?class=\"version\"");
 	private static final Pattern DATE = Pattern.compile("\"author\">\\s+(.*?)\\s+(&nbsp;|<)");
 
 	private static final Pattern PROS = Pattern.compile("Pros<\\/p>.*?\">([\\s\\S]*?)<\\/p>");
