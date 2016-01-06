@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 4.3.11
+-- version 4.5.3.1
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 02. Jan 2016 um 23:56
+-- Erstellungszeit: 06. Jan 2016 um 13:25
 -- Server-Version: 5.6.24
 -- PHP-Version: 5.6.8
 
@@ -14,7 +14,7 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Datenbank: `download_com_crawler`
@@ -22,13 +22,38 @@ SET time_zone = "+00:00";
 CREATE DATABASE IF NOT EXISTS `download_com_crawler` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `download_com_crawler`;
 
+DELIMITER $$
+--
+-- Funktionen
+--
+DROP FUNCTION IF EXISTS `GET_OID`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `GET_OID` (`APID` INT) RETURNS VARCHAR(100) CHARSET utf8mb4 BEGIN
+  DECLARE OID_FOUND INT;
+
+  SELECT `oid` INTO OID_FOUND FROM `download_com_products` WHERE `pid` = APID;
+
+  RETURN CONCAT('3000-', OID_FOUND, '_4-', APID);
+END$$
+
+DROP FUNCTION IF EXISTS `GET_URL`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `GET_URL` (`APID` INT) RETURNS VARCHAR(500) CHARSET utf8mb4 BEGIN
+  DECLARE OID varchar(100);
+
+  SELECT GET_OID(APID) INTO OID;
+
+  RETURN CONCAT('http://download.cnet.com/id/', OID, '.html');
+END$$
+
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
 -- Tabellenstruktur für Tabelle `download_com_products`
 --
 
-CREATE TABLE IF NOT EXISTS `download_com_products` (
+DROP TABLE IF EXISTS `download_com_products`;
+CREATE TABLE `download_com_products` (
   `id` int(11) NOT NULL COMMENT 'internal usage',
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'internal usage',
   `modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'internal usage',
@@ -57,7 +82,8 @@ CREATE TABLE IF NOT EXISTS `download_com_products` (
 -- Tabellenstruktur für Tabelle `download_com_product_user_reviews`
 --
 
-CREATE TABLE IF NOT EXISTS `download_com_product_user_reviews` (
+DROP TABLE IF EXISTS `download_com_product_user_reviews`;
+CREATE TABLE `download_com_product_user_reviews` (
   `id` int(11) NOT NULL COMMENT 'internal usage',
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'internal usage',
   `modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'internal usage',
@@ -81,19 +107,20 @@ CREATE TABLE IF NOT EXISTS `download_com_product_user_reviews` (
 -- Tabellenstruktur für Tabelle `download_com_product_versions`
 --
 
-CREATE TABLE IF NOT EXISTS `download_com_product_versions` (
+DROP TABLE IF EXISTS `download_com_product_versions`;
+CREATE TABLE `download_com_product_versions` (
   `id` int(11) NOT NULL COMMENT 'internal usage',
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'internal usage',
   `modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'internal usage',
   `id_p` int(9) NOT NULL COMMENT 'related product id',
   `vid` int(9) NOT NULL COMMENT 'version id of the product',
-  `version_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `version_name` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
   `version_alterations` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `version_publish_date` date NOT NULL,
   `version_added_date` date NOT NULL,
   `version_identifier` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `operating_systems` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `additional_requirements` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `operating_systems` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `additional_requirements` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL,
   `download_size` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `download_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `download_link` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -112,19 +139,22 @@ CREATE TABLE IF NOT EXISTS `download_com_product_versions` (
 -- Indizes für die Tabelle `download_com_products`
 --
 ALTER TABLE `download_com_products`
-  ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `pid` (`pid`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `pid` (`pid`);
 
 --
 -- Indizes für die Tabelle `download_com_product_user_reviews`
 --
 ALTER TABLE `download_com_product_user_reviews`
-  ADD PRIMARY KEY (`id`), ADD KEY `mid` (`mid`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `mid` (`mid`);
 
 --
 -- Indizes für die Tabelle `download_com_product_versions`
 --
 ALTER TABLE `download_com_product_versions`
-  ADD PRIMARY KEY (`id`), ADD KEY `vid` (`vid`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `vid` (`vid`);
 
 --
 -- AUTO_INCREMENT für exportierte Tabellen
