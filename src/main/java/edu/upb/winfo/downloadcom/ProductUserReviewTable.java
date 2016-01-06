@@ -16,6 +16,14 @@ public class ProductUserReviewTable extends DatabaseTable {
 		super(connArg);
 	}
 
+	/**
+	 * Checks if the user review for the product version of a product set is in the database
+	 *
+	 * @param mid message id
+	 * @param id_p product set id
+	 * @param id_v product version id
+	 * @return true if exists
+	 */
 	public boolean hasProductUserReview(int mid, int id_p, int id_v) throws SQLException {
 		int count = 0;
 		PreparedStatement stmt = null;
@@ -41,6 +49,22 @@ public class ProductUserReviewTable extends DatabaseTable {
 		return count > 0;
 	}
 
+	/**
+	 * Adds or edits a product user review to the database
+	 *
+	 * @param mid message id
+	 * @param id_p product set id
+	 * @param id_v product version id
+	 * @param rating double
+	 * @param title string
+	 * @param author string
+	 * @param date date
+	 * @param pros string
+	 * @param cons string
+	 * @param summary string
+	 * @param thumbs_up integer
+	 * @param thumbs_down integer
+	 */
 	public void updateProductUserReview(int mid, int id_p, int id_v, double rating, String title, String author,
 	                                    Date date, String pros, String cons, String summary, int thumbs_up,
 	                                    int thumbs_down) throws SQLException {

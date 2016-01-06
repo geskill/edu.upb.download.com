@@ -16,6 +16,12 @@ public class ProductTable extends DatabaseTable {
 		super(connArg);
 	}
 
+	/**
+	 * Checks if the product is in the database
+	 *
+	 * @param pid product set id
+	 * @return true if exists
+	 */
 	public boolean hasProduct(int pid) throws SQLException {
 		int count = 0;
 		PreparedStatement stmt = null;
@@ -39,6 +45,27 @@ public class ProductTable extends DatabaseTable {
 		return count > 0;
 	}
 
+	/**
+	 * Adds or edits a product to the database
+	 *
+	 * @param pid product set id
+	 * @param oid ontology id
+	 * @param editors_review_name string
+	 * @param editors_review_date date
+	 * @param editors_review_description string
+	 * @param editors_review_text string
+	 * @param editors_review_rating double
+	 * @param users_review_rating double
+	 * @param users_review_rating_count integer
+	 * @param publisher_description string
+	 * @param publisher_description_alterations string
+	 * @param publisher_name string
+	 * @param publisher_url string
+	 * @param platform string
+	 * @param category string
+	 * @param subcategory string
+	 * @param latest_id_v the latest version of the product
+	 */
 	public void updateProduct(int pid, int oid, String editors_review_name, Date editors_review_date,
 	                          String editors_review_description, String editors_review_text,
 	                          double editors_review_rating, double users_review_rating,

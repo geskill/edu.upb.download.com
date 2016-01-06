@@ -16,6 +16,13 @@ public class ProductVersionTable extends DatabaseTable {
 		super(connArg);
 	}
 
+	/**
+	 * Checks if the product version of the product set is in the database
+	 *
+	 * @param id_p product set id
+	 * @param vid product version id
+	 * @return true if exists
+	 */
 	public boolean hasProductVersion(int id_p, int vid) throws SQLException {
 		int count = 0;
 		PreparedStatement stmt = null;
@@ -41,6 +48,12 @@ public class ProductVersionTable extends DatabaseTable {
 		return count > 0;
 	}
 
+	/**
+	 * Returns the product set id from the product version id
+	 *
+	 * @param vid product version id
+	 * @return returns the product set id or 0
+	 */
 	public int getProductIDFromVersionID(int vid) throws SQLException {
 		int result = 0;
 		PreparedStatement stmt = null;
@@ -64,6 +77,27 @@ public class ProductVersionTable extends DatabaseTable {
 		return result;
 	}
 
+	/**
+	 * Adds or edits a product version to the database
+	 *
+	 * @param id_p product set id
+	 * @param vid product version id
+	 * @param version_name string
+	 * @param version_alterations string
+	 * @param version_publish_date date
+	 * @param version_added_date string
+	 * @param version_identifier string
+	 * @param operating_systems string
+	 * @param additional_requirements string
+	 * @param download_size string
+	 * @param download_name string
+	 * @param download_link string
+	 * @param downloads_total integer
+	 * @param downloads_last_week integer
+	 * @param license_model string
+	 * @param license_limitations string
+	 * @param license_cost string
+	 */
 	public void updateProductVersion(int id_p, int vid, String version_name, String version_alterations,
 	                                 Date version_publish_date, Date version_added_date, String version_identifier,
 	                                 String operating_systems, String additional_requirements, String download_size,
