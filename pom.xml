@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>upb.downloadcom</groupId>
-    <artifactId>upb.downloadcom</artifactId>
+    <groupId>edu.upb.winfo.downloadcom</groupId>
+    <artifactId>edu.upb.winfo.downloadcom</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <dependencies>
         <dependency>
@@ -26,4 +26,23 @@
             <version>4.12</version>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.jolira</groupId>
+                <artifactId>onejar-maven-plugin</artifactId>
+                <version>1.4.4</version>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <mainClass>edu.upb.winfo.downloadcom.App</mainClass>
+                        </configuration>
+                        <goals>
+                            <goal>one-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
