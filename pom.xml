@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.upb.winfo.downloadcom</groupId>
     <artifactId>edu.upb.winfo.downloadcom</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <dependencies>
         <dependency>
             <groupId>edu.uci.ics</groupId>
@@ -40,6 +40,62 @@
                         <goals>
                             <goal>one-jar</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>sh.tak.appbundler</groupId>
+                <artifactId>appbundle-maven-plugin</artifactId>
+                <version>1.0.4</version>
+                <configuration>
+                    <mainClass>edu.upb.winfo.downloadcom.App</mainClass>
+                    <iconFile>res/Logo-x64.ico</iconFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>1.5.1</version>
+                <executions>
+                    <execution>
+                        <id>l4j-clui</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>console</headerType>
+                            <dontWrapJar>true</dontWrapJar>
+                            <errTitle>edu.upb.winfo.downloadcom</errTitle>
+                            <jar>${project.artifactId}-${project.version}.one-jar.jar</jar>
+                            <outfile>${project.build.directory}/edu.upb.winfo.downloadcom.exe</outfile>
+                            <downloadUrl>https://java.com/download</downloadUrl>
+                            <icon>res/Logo-x64.ico</icon>
+                            <jre>
+                                <minVersion>1.8.0_66</minVersion>
+                                <jdkPreference>preferJre</jdkPreference>
+                            </jre>
+                            <versionInfo>
+                                <fileVersion>1.0.0.0</fileVersion>
+                                <txtFileVersion>${project.version}</txtFileVersion>
+                                <fileDescription>open source download.com crawler</fileDescription>
+                                <copyright>(c) 2016 Sebastian Klatte</copyright>
+                                <productVersion>1.0.0.0</productVersion>
+                                <txtProductVersion>1.0.0.0</txtProductVersion>
+                                <productName>edu.upb.winfo.downloadcom</productName>
+                                <companyName/>
+                                <internalName>edu.upb.winfo.downloadcom</internalName>
+                                <originalFilename>edu.upb.winfo.downloadcom.exe</originalFilename>
+                            </versionInfo>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
