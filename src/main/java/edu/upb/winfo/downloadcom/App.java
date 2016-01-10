@@ -15,7 +15,7 @@ import org.apache.log4j.varia.LevelRangeFilter;
 
 /**
  * Created by geskill on 30.12.2015.
- *
+ * <p>
  * crawler4j has some issues, that hinder the crawler to be more efficient
  * https://github.com/yasserg/crawler4j/issues/16
  *
@@ -28,7 +28,7 @@ public class App {
 	public static void main(String[] args) throws Exception {
 
 		/*
-         * Instantiate the application logging system.
+	     * Instantiate the application logging system.
          */
 		Logger logger = Logger.getRootLogger();
 
@@ -55,7 +55,7 @@ public class App {
          */
 		FileAppender fileAppender = new FileAppender();
 		fileAppender.setName("FileAppender");
-		fileAppender.setFile("data/log/log.txt", true, false, 8*1024); // setFile(fileName) has bug
+		fileAppender.setFile("data/log/log.txt", true, false, 8 * 1024); // setFile(fileName) has bug
 		fileAppender.setLayout(new PatternLayout("%d{ISO8601}|%-6r [%t] %-5p %30.30c %x - %m%n"));
 		fileAppender.addFilter(filter);
 		logger.addAppender(fileAppender);
@@ -64,6 +64,11 @@ public class App {
          * Create now the database access.
          */
 		DATABASE = new LocalDatabase("data/config/database.xml");
+
+		/*
+         * Create the seeds reader.
+         */
+		SeedReader seedReader = new SeedReader("data/config/seeds.txt");
 
 		/*
          * Instantiate the crawler configuration
@@ -91,13 +96,9 @@ public class App {
          * URLs that are fetched and then the crawler starts following links
          * which are found in these pages
          */
-		controller.addSeed("http://download.cnet.com/");
-		controller.addSeed("http://download.cnet.com/windows/");
-		controller.addSeed("http://download.cnet.com/mac/");
-		controller.addSeed("http://download.cnet.com/webware/");
-		controller.addSeed("http://download.cnet.com/ios/");
-		controller.addSeed("http://download.cnet.com/android/");
-		controller.addSeed("http://download.cnet.com/mobile/");
+		for (String s : seedReader.getSeeds()) {
+			controller.addSeed(s);
+		}
 
         /*
          * Start the crawl. This is a blocking operation, meaning that your code
