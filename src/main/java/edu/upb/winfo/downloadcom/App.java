@@ -1,6 +1,7 @@
 package edu.upb.winfo.downloadcom;
 
 import java.io.OutputStreamWriter;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
@@ -9,8 +10,6 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 import jd.http.RandomUserAgent;
 import org.apache.log4j.*;
-import org.apache.log4j.spi.Filter;
-import org.apache.log4j.varia.LevelMatchFilter;
 import org.apache.log4j.varia.LevelRangeFilter;
 
 /**
@@ -39,7 +38,7 @@ public class App {
 		filter.setAcceptOnMatch(true);
 		filter.setLevelMin(Level.INFO);
 		filter.setLevelMax(Level.FATAL);
-
+		
 		/*
          * Write log to console.
          */
@@ -63,7 +62,11 @@ public class App {
 		/*
          * Create now the database access.
          */
-		DATABASE = new LocalDatabase("data/config/database.xml");
+		AtomicBoolean success = new AtomicBoolean(false);
+		DATABASE = new LocalDatabase("data/config/database.xml", success);
+		if (!success.get()) {
+			return ;
+		}
 
 		/*
          * Create the seeds reader.

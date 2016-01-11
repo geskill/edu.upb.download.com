@@ -48,8 +48,12 @@
                 <artifactId>appbundle-maven-plugin</artifactId>
                 <version>1.0.4</version>
                 <configuration>
+                    <jvmOptions>
+                        <jvmOption>-Xmx5g</jvmOption>
+                        <jvmOption>-XX:+UseParallelGC</jvmOption>
+                    </jvmOptions>
                     <mainClass>edu.upb.winfo.downloadcom.App</mainClass>
-                    <iconFile>res/Logo-x64.ico</iconFile>
+                    <iconFile>res/Logo-xSet.icns</iconFile>
                 </configuration>
                 <executions>
                     <execution>

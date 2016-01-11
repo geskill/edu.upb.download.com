@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by geskill on 02.01.2016.
@@ -26,7 +27,7 @@ public class LocalDatabase implements DatabaseInterface {
 	/**
 	 * @param propertiesFileName Filename of the settings file
 	 */
-	public LocalDatabase(String propertiesFileName) {
+	public LocalDatabase(String propertiesFileName, AtomicBoolean success) {
 		DatabaseConnection databaseConnection = null;
 		try {
 			databaseConnection = new DatabaseConnection(propertiesFileName);
@@ -43,6 +44,8 @@ public class LocalDatabase implements DatabaseInterface {
 		this.productTable = new ProductTable(this.connection);
 		this.productVersionTable = new ProductVersionTable(this.connection);
 		this.productUserReviewTable = new ProductUserReviewTable(this.connection);
+
+		success.set(true);
 	}
 
 	/**
