@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.ultramixer.jarbundler:jarbundler-core:3.3.0">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/ultramixer/jarbundler/jarbundler-core/3.3.0/jarbundler-core-3.3.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/ultramixer/jarbundler/jarbundler-core/3.3.0/jarbundler-core-3.3.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/ultramixer/jarbundler/jarbundler-core/3.3.0/jarbundler-core-3.3.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
