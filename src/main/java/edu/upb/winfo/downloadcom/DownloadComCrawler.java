@@ -2,8 +2,7 @@ package edu.upb.winfo.downloadcom;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
@@ -85,6 +84,10 @@ public class DownloadComCrawler extends WebCrawler {
 		// TODO: Remote database should check if the entry exists (if possible [exception i.e. /ccleaner/])
 	}
 
+	private static final int MAX_BAD_URL_RETRY = 3;
+
+	private Hashtable<String, Integer> problematicURLs = new Hashtable<String, Integer>();
+
 	/**
 	 * This function is called once the header of a page is fetched. It can be
 	 * overridden by sub-classes to perform custom logic for different status
@@ -92,13 +95,36 @@ public class DownloadComCrawler extends WebCrawler {
 	 *
 	 * All pages being skipped because of server problems (thus of 500 and 502)
 	 * are re-inserted into the query
+	 *
+	 * However, sometimes the crawler fetches URLs that are really not reachable
+	 * for this reason the problematicURls Hashtable is used. Every problematic
+	 * URL will be inserted in this table. Every time the same problematic URL
+	 * will be processed in this procedure, the count of this URL will be
+	 * increased until the count is greater than MAX_BAD_URL_RETRY. After 3
+	 * retries the URL will be skipped finally.
 	 */
 	@Override
 	protected void handlePageStatusCode(WebURL webUrl, int statusCode, String statusDescription) {
 
 		if (statusCode != HttpStatus.SC_OK) {
-
+			
 			if ((statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) || (statusCode == HttpStatus.SC_BAD_GATEWAY)) {
+
+				String canonicalUrl = URLCanonicalizer.getCanonicalURL(webUrl.getURL());
+				if (this.problematicURLs.containsKey(canonicalUrl)) {
+
+					int retryCount = this.problematicURLs.get(canonicalUrl);
+
+					if (retryCount >= MAX_BAD_URL_RETRY) {
+						logger.info("FINALLY SKIPPING: " + webUrl.getURL());
+						return; // Slip the schedule insertion
+					} else {
+						this.problematicURLs.put(canonicalUrl, retryCount + 1);
+					}
+				} else {
+					this.problematicURLs.put(canonicalUrl, 1);
+				}
+
 				// re-insert problematic URL (prevent skipping using Frontier directly)
 				this.getMyController().getFrontier().schedule(webUrl);
 			}
