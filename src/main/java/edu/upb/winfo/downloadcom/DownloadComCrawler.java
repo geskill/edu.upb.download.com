@@ -10,9 +10,11 @@ import com.google.gson.Gson;
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
+import edu.uci.ics.crawler4j.url.URLCanonicalizer;
 import edu.uci.ics.crawler4j.url.WebURL;
 import edu.upb.winfo.utils.DateParser;
 import edu.upb.winfo.utils.RegEx;
+import org.apache.http.HttpStatus;
 
 import java.util.regex.Matcher;
 
@@ -81,6 +83,26 @@ public class DownloadComCrawler extends WebCrawler {
 				&& !href.startsWith("http://download.cnet.com/security-center/"); // don't search in the special security center area
 
 		// TODO: Remote database should check if the entry exists (if possible [exception i.e. /ccleaner/])
+	}
+
+	/**
+	 * This function is called once the header of a page is fetched. It can be
+	 * overridden by sub-classes to perform custom logic for different status
+	 * codes. For example, 404 pages can be logged, etc.
+	 *
+	 * All pages being skipped because of server problems (thus of 500 and 502)
+	 * are re-inserted into the query
+	 */
+	@Override
+	protected void handlePageStatusCode(WebURL webUrl, int statusCode, String statusDescription) {
+
+		if (statusCode != HttpStatus.SC_OK) {
+
+			if ((statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) || (statusCode == HttpStatus.SC_BAD_GATEWAY)) {
+				// re-insert problematic URL (prevent skipping using Frontier directly)
+				this.getMyController().getFrontier().schedule(webUrl);
+			}
+		}
 	}
 
 	/**
