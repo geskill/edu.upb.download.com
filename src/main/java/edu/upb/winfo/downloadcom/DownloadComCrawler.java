@@ -84,51 +84,52 @@ public class DownloadComCrawler extends WebCrawler {
 		// TODO: Remote database should check if the entry exists (if possible [exception i.e. /ccleaner/])
 	}
 
-	private static final int MAX_BAD_URL_RETRY = 3;
-
-	private Hashtable<String, Integer> problematicURLs = new Hashtable<String, Integer>();
-
 	/**
 	 * This function is called once the header of a page is fetched. It can be
 	 * overridden by sub-classes to perform custom logic for different status
 	 * codes. For example, 404 pages can be logged, etc.
 	 *
-	 * All pages being skipped because of server problems (thus of 500 and 502)
-	 * are re-inserted into the query
-	 *
-	 * However, sometimes the crawler fetches URLs that are really not reachable
-	 * for this reason the problematicURls Hashtable is used. Every problematic
-	 * URL will be inserted in this table. Every time the same problematic URL
-	 * will be processed in this procedure, the count of this URL will be
-	 * increased until the count is greater than MAX_BAD_URL_RETRY. After 3
-	 * retries the URL will be skipped finally.
+	 * @param webUrl WebUrl containing the statusCode
+	 * @param statusCode Html Status Code number
+	 * @param statusDescription Html Status COde description
 	 */
 	@Override
 	protected void handlePageStatusCode(WebURL webUrl, int statusCode, String statusDescription) {
 
+		super.handlePageStatusCode(webUrl, statusCode, statusDescription);
+
 		if (statusCode != HttpStatus.SC_OK) {
-			
+
 			if ((statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) || (statusCode == HttpStatus.SC_BAD_GATEWAY)) {
 
-				String canonicalUrl = URLCanonicalizer.getCanonicalURL(webUrl.getURL());
-				if (this.problematicURLs.containsKey(canonicalUrl)) {
-
-					int retryCount = this.problematicURLs.get(canonicalUrl);
-
-					if (retryCount >= MAX_BAD_URL_RETRY) {
-						logger.info("FINALLY SKIPPING: " + webUrl.getURL());
-						return; // Slip the schedule insertion
-					} else {
-						this.problematicURLs.put(canonicalUrl, retryCount + 1);
-					}
-				} else {
-					this.problematicURLs.put(canonicalUrl, 1);
-				}
-
-				// re-insert problematic URL (prevent skipping using Frontier directly)
-				this.getMyController().getFrontier().schedule(webUrl);
+				this.handleProblematicURL(webUrl);
 			}
 		}
+	}
+
+	/**
+	 * This function is called if the content of a url could not be fetched.
+	 *
+	 * @param webUrl URL which content failed to be fetched
+	 */
+	@Override
+	protected void onContentFetchError(WebURL webUrl) {
+
+		super.onContentFetchError(webUrl);
+
+		this.handleProblematicURL(webUrl);
+	}
+
+	/**
+	 * This function is called when a unhandled exception was encountered during fetching
+	 *
+	 * @param webUrl URL where a unhandled exception occured
+	 */
+	protected void onUnhandledException(WebURL webUrl, Throwable e) {
+
+		super.onUnhandledException(webUrl, e);
+
+		this.handleProblematicURL(webUrl);
 	}
 
 	/**
@@ -137,6 +138,8 @@ public class DownloadComCrawler extends WebCrawler {
 	 *
 	 * We need to check if the visited page is a detailed product page
 	 * or a comments only page. Otherwise we do nothing.
+	 *
+	 * @param page the page object that is just fetched and parsed.
 	 */
 	@Override
 	public void visit(Page page) {
@@ -523,5 +526,41 @@ public class DownloadComCrawler extends WebCrawler {
 			}
 		}
 
+	}
+
+	private static final int MAX_BAD_URL_RETRY = 3;
+
+	private Hashtable<String, Integer> problematicURLs = new Hashtable<String, Integer>();
+
+	/**
+	 * All pages being skipped because of server problems (thus of 500 and 502)
+	 * are re-inserted into the query
+	 *
+	 * However, sometimes the crawler fetches URLs that are really not reachable
+	 * for this reason the problematicURls Hashtable is used. Every problematic
+	 * URL will be inserted in this table. Every time the same problematic URL
+	 * will be processed in this procedure, the count of this URL will be
+	 * increased until the count is greater than MAX_BAD_URL_RETRY. After 3
+	 * retries the URL will be skipped finally.
+	 */
+	protected void handleProblematicURL(WebURL webUrl) {
+
+		String canonicalUrl = URLCanonicalizer.getCanonicalURL(webUrl.getURL());
+		if (this.problematicURLs.containsKey(canonicalUrl)) {
+
+			int retryCount = this.problematicURLs.get(canonicalUrl);
+
+			if (retryCount >= MAX_BAD_URL_RETRY) {
+				logger.info("FINALLY SKIPPING: " + webUrl.getURL());
+				return; // Slip the schedule insertion
+			} else {
+				this.problematicURLs.put(canonicalUrl, retryCount + 1);
+			}
+		} else {
+			this.problematicURLs.put(canonicalUrl, 1);
+		}
+
+		// re-insert problematic URL (prevent skipping using Frontier directly)
+		this.getMyController().getFrontier().schedule(webUrl);
 	}
 }

@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.upb.winfo.downloadcom</groupId>
     <artifactId>edu.upb.winfo.downloadcom</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <dependencies>
         <dependency>
             <groupId>edu.uci.ics</groupId>
             <artifactId>crawler4j</artifactId>
-            <version>4.1</version>
+            <version>4.2</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -42,6 +42,7 @@
                         <configuration>
                             <mainClass>edu.upb.winfo.downloadcom.App</mainClass>
                         </configuration>
+                        <phase>package</phase>
                         <goals>
                             <goal>one-jar</goal>
                         </goals>
@@ -78,7 +79,7 @@
                                             vmoptions="-Xmx1024m"
                                             shortname="${project.name}"
                                             workingdirectory="$APP_PACKAGE/Contents/Resources/Java"
-                                            jar="${project.artifactId}-${project.version}.one-jar.jar">
+                                            jar="${project.build.directory}/${project.artifactId}-${project.version}.one-jar.jar">
                                     <javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
                                 </jarbundler>
                             </tasks>
@@ -136,12 +137,12 @@
                                 <jdkPreference>preferJre</jdkPreference>
                             </jre>
                             <versionInfo>
-                                <fileVersion>1.0.0.0</fileVersion>
+                                <fileVersion>${project.version}.0</fileVersion>
                                 <txtFileVersion>${project.version}</txtFileVersion>
                                 <fileDescription>open source download.com crawler</fileDescription>
                                 <copyright>(c) 2016 Sebastian Klatte</copyright>
-                                <productVersion>1.0.0.0</productVersion>
-                                <txtProductVersion>1.0.0.0</txtProductVersion>
+                                <productVersion>${project.version}.0</productVersion>
+                                <txtProductVersion>${project.version}.0</txtProductVersion>
                                 <productName>edu.upb.winfo.downloadcom</productName>
                                 <companyName/>
                                 <internalName>edu.upb.winfo.downloadcom</internalName>

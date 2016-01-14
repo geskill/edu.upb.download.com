@@ -27,20 +27,20 @@ public class App {
 	public static void main(String[] args) throws Exception {
 
 		/*
-	     * Instantiate the application logging system.
+		 * Instantiate the application logging system.
          */
 		Logger logger = Logger.getRootLogger();
 
 		/*
-         * Define log filter, to no log everything.
+		 * Define log filter, to no log everything.
          */
 		LevelRangeFilter filter = new LevelRangeFilter();
 		filter.setAcceptOnMatch(true);
 		filter.setLevelMin(Level.INFO);
 		filter.setLevelMax(Level.FATAL);
-		
+
 		/*
-         * Write log to console.
+		 * Write log to console.
          */
 		ConsoleAppender consoleAppender = new ConsoleAppender();
 		consoleAppender.setName("ConsoleAppender");
@@ -50,7 +50,7 @@ public class App {
 		logger.addAppender(consoleAppender);
 
 		/*
-         * Write log to file.
+		 * Write log to file.
          */
 		FileAppender fileAppender = new FileAppender();
 		fileAppender.setName("FileAppender");
@@ -65,7 +65,7 @@ public class App {
 		AtomicBoolean success = new AtomicBoolean(false);
 		DATABASE = new LocalDatabase("data/config/database.xml", success);
 		if (!success.get()) {
-			return ;
+			return;
 		}
 
 		/*
