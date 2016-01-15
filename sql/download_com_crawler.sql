@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 06. Jan 2016 um 13:25
+-- Erstellungszeit: 15. Jan 2016 um 15:02
 -- Server-Version: 5.6.24
 -- PHP-Version: 5.6.8
 
@@ -30,7 +30,7 @@ DROP FUNCTION IF EXISTS `GET_OID`$$
 CREATE DEFINER=`root`@`localhost` FUNCTION `GET_OID` (`APID` INT) RETURNS VARCHAR(100) CHARSET utf8mb4 BEGIN
   DECLARE OID_FOUND INT;
 
-  SELECT `oid` INTO OID_FOUND FROM `download_com_products` WHERE `pid` = APID;
+    SELECT `oid` INTO OID_FOUND FROM `download_com_products` WHERE `pid` = APID;
 
   RETURN CONCAT('3000-', OID_FOUND, '_4-', APID);
 END$$
@@ -114,13 +114,13 @@ CREATE TABLE `download_com_product_versions` (
   `modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'internal usage',
   `id_p` int(9) NOT NULL COMMENT 'related product id',
   `vid` int(9) NOT NULL COMMENT 'version id of the product',
-  `version_name` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `version_name` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `version_alterations` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `version_publish_date` date NOT NULL,
   `version_added_date` date NOT NULL,
   `version_identifier` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `operating_systems` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `additional_requirements` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `additional_requirements` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `download_size` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `download_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `download_link` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -147,14 +147,14 @@ ALTER TABLE `download_com_products`
 --
 ALTER TABLE `download_com_product_user_reviews`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `mid` (`mid`);
+  ADD UNIQUE KEY `mid` (`mid`);
 
 --
 -- Indizes für die Tabelle `download_com_product_versions`
 --
 ALTER TABLE `download_com_product_versions`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `vid` (`vid`);
+  ADD UNIQUE KEY `vid` (`vid`);
 
 --
 -- AUTO_INCREMENT für exportierte Tabellen
