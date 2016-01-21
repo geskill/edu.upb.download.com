@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 15. Jan 2016 um 15:02
+-- Erstellungszeit: 21. Jan 2016 um 20:10
 -- Server-Version: 5.6.24
 -- PHP-Version: 5.6.8
 
@@ -26,22 +26,53 @@ DELIMITER $$
 --
 -- Funktionen
 --
-DROP FUNCTION IF EXISTS `GET_OID`$$
-CREATE DEFINER=`root`@`localhost` FUNCTION `GET_OID` (`APID` INT) RETURNS VARCHAR(100) CHARSET utf8mb4 BEGIN
-  DECLARE OID_FOUND INT;
+DROP FUNCTION IF EXISTS `GET_OID_FROM_PID`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `GET_OID_FROM_PID` (`APID` INT) RETURNS INT(9) BEGIN
+  DECLARE OntologyID INT(9);
 
-    SELECT `oid` INTO OID_FOUND FROM `download_com_products` WHERE `pid` = APID;
+  SELECT `oid` INTO OntologyID FROM `download_com_products` WHERE `pid` = APID;
 
-  RETURN CONCAT('3000-', OID_FOUND, '_4-', APID);
+  RETURN OntologyID;
+END$$
+
+DROP FUNCTION IF EXISTS `GET_PID_FROM_VID`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `GET_PID_FROM_VID` (`AVID` INT) RETURNS INT(9) BEGIN
+  DECLARE PID INT(9);
+
+  SELECT `id_p` INTO PID FROM `download_com_product_versions` WHERE `vid` = AVID;
+
+  RETURN PID;
 END$$
 
 DROP FUNCTION IF EXISTS `GET_URL`$$
-CREATE DEFINER=`root`@`localhost` FUNCTION `GET_URL` (`APID` INT) RETURNS VARCHAR(500) CHARSET utf8mb4 BEGIN
-  DECLARE OID varchar(100);
+CREATE DEFINER=`root`@`localhost` FUNCTION `GET_URL` (`AID` INT) RETURNS VARCHAR(100) CHARSET utf8mb4 BEGIN
+  DECLARE PID int(9);
+  DECLARE OID int(9);
+  DECLARE OID_STRING VARCHAR(100);
 
-  SELECT GET_OID(APID) INTO OID;
+  IF IS_PID(AID) = 0 THEN
+    SET PID = GET_PID_FROM_VID(AID);
+  ELSE
+    SET PID = AID;
+  END IF;
 
-  RETURN CONCAT('http://download.cnet.com/id/', OID, '.html');
+  SELECT GET_OID_FROM_PID(PID) INTO OID;
+  
+  SET OID_STRING = CONCAT('3000-', OID, '_4-', AID);
+  
+  RETURN CONCAT('http://download.cnet.com/id/', OID_STRING, '.html');
+END$$
+
+DROP FUNCTION IF EXISTS `IS_PID`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `IS_PID` (`AID` INT) RETURNS TINYINT(4) BEGIN
+  DECLARE PID_FOUND TINYINT;
+  SET PID_FOUND = 0;
+  
+  IF EXISTS (SELECT * FROM `download_com_products` WHERE `pid` = AID) THEN
+    SET PID_FOUND = 1;
+  END IF;
+    
+  RETURN PID_FOUND;
 END$$
 
 DELIMITER ;
@@ -92,7 +123,7 @@ CREATE TABLE `download_com_product_user_reviews` (
   `id_v` int(9) NOT NULL COMMENT 'related version id of product',
   `rating` double NOT NULL,
   `title` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `author` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `author` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `date` date NOT NULL,
   `pros` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `cons` text COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -127,7 +158,7 @@ CREATE TABLE `download_com_product_versions` (
   `downloads_total` int(10) NOT NULL,
   `downloads_last_week` int(10) NOT NULL,
   `license_model` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `license_limitations` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `license_limitations` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL,
   `license_cost` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

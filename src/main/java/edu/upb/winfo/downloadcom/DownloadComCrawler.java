@@ -552,7 +552,7 @@ public class DownloadComCrawler extends WebCrawler {
 
 			if (retryCount >= MAX_BAD_URL_RETRY) {
 				logger.info("FINALLY SKIPPING: " + webUrl.getURL());
-				return; // Slip the schedule insertion
+				return; // Skip the schedule insertion
 			} else {
 				this.problematicURLs.put(canonicalUrl, retryCount + 1);
 			}
