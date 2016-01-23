@@ -227,6 +227,7 @@ public class DownloadComCrawler extends WebCrawler {
 	private static final Pattern PUBLISHER_URL = Pattern.compile("specsPubName[\\s\\S]*?Publisher[\\s\\S]*?href=\"(.*?)\"");
 
 	private static final Pattern PLATFORM = Pattern.compile("breadcrumb\"[\\s\\S]*?href=\\/.*?\\/\\?tag=bc>(.*?)<\\/a>");
+	private static final Pattern PLATFORM_HIDDEN = Pattern.compile("breadcrumb\"[\\s\\S]*?href=\\/(\\w+)\\/\\w+");
 	private static final Pattern CATEGORY = Pattern.compile("specsCategory[\\s\\S]*?Category[\\s\\S]*?\">(.*?)<");
 	private static final Pattern SUBCATEGORY = Pattern.compile("specsSubcategory[\\s\\S]*?Subcategory[\\s\\S]*?\">(.*?)<");
 
@@ -280,6 +281,14 @@ public class DownloadComCrawler extends WebCrawler {
 		String publisher_name = RegEx.getMatch(PUBLISHER_NAME, pageContent);
 		String publisher_url = RegEx.getMatch(PUBLISHER_URL, pageContent);
 		String platform = RegEx.getMatch(PLATFORM, pageContent);
+		if (platform.isEmpty()) { // special cases
+			platform = RegEx.getMatch(PLATFORM_HIDDEN, pageContent);
+			if ("webware".equals(platform)) {
+				platform = "Web Apps";
+			} else if ("linux".equals(platform)) {
+				platform = "Linux Software";
+			}
+		}
 		String category = RegEx.getMatch(CATEGORY, pageContent);
 		String subcategory = RegEx.getMatch(SUBCATEGORY, pageContent);
 
