@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.3.1
+-- version 4.5.4.1
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 21. Jan 2016 um 20:10
+-- Erstellungszeit: 01. Feb 2016 um 11:47
 -- Server-Version: 5.6.24
 -- PHP-Version: 5.6.8
 
@@ -99,7 +99,7 @@ CREATE TABLE `download_com_products` (
   `users_review_rating_count` int(6) NOT NULL,
   `publisher_description` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `publisher_description_alterations` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `publisher_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `publisher_name` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `publisher_url` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
   `platform` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `category` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -149,11 +149,11 @@ CREATE TABLE `download_com_product_versions` (
   `version_alterations` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `version_publish_date` date NOT NULL,
   `version_added_date` date NOT NULL,
-  `version_identifier` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `version_identifier` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `operating_systems` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL,
   `additional_requirements` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `download_size` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `download_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `download_name` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `download_link` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
   `downloads_total` int(10) NOT NULL,
   `downloads_last_week` int(10) NOT NULL,
